@@ -236,9 +236,9 @@
                 
                 // Pistes d'aide pour l'utilisateur
                 const hints = [
-                    `Ceci est une identité remarquable de type : **${ir.forme}**`,
-                    `Rappelez-vous la formule : **${ir.developpe || ir.factorise}**`,
-                    `Identifiez **a** et **b** : dans ce cas, \\( a = ${a}x \\) et \\( b = ${b} \\).`
+                    `Ceci est une identité remarquable de type : <strong>${ir.forme}</strong>`,
+                    `Rappelez-vous la formule : <strong>${ir.developpe || ir.factorise}</strong>`,
+                    `Identifiez <strong>a</strong> et <strong>b</strong> : dans ce cas, \\( a = ${a}x \\) et \\( b = ${b} \\).`
                 ];
 
                 const exerciceHtml = createExerciceHtml(sectionName, i, problemLatex, solutionLatex, hints);
@@ -266,7 +266,7 @@
             
             return `
                 <div class="problem">
-                    **Exercice ${num}** : ${problemLatex}
+                    <strong>Exercice ${num}</strong> : ${problemLatex}
                 </div>
                 <div class="action-buttons">
                     <button class="hint-button" onclick="showNextHint('${sectionName}', ${index}, ${hints.length})">Piste (${hints.length} max)</button>
@@ -274,7 +274,7 @@
                 </div>
                 ${hintsHtml}
                 <div id="${uniqueId}-solution" class="solution">
-                    **Solution :** ${solutionLatex}
+                    <strong>Solution :</strong> ${solutionLatex}
                 </div>
             `;
         }
