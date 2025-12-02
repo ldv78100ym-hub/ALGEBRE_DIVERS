@@ -2,692 +2,668 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Générateur de Calculs Aléatoires</title>
-    
-        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathématiques - Accueil Dynamique</title>
     
     <style>
+        /* --- VARIABLES --- */
+        :root {
+            --primary-color: #4CAF50; 
+            --secondary-color: #607D8B;
+            --text-dark: #263238;
+            --container-bg: #ffffff;
+            --border-radius: 12px;
+            --shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- FOND D'ÉCRAN ANIMÉ --- */
+        @keyframes backgroundTransition {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex; 
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 30px; 
+            padding-bottom: 30px;
+            overflow-x: hidden; 
+            
+            background: linear-gradient(-45deg, #e0f2f1, #e3f2fd, #fce4ec, #fcfbe3); 
+            background-size: 400% 400%;
+            animation: backgroundTransition 15s ease infinite;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background-color: var(--container-bg);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            position: relative;
+            
             display: flex;
             flex-direction: column;
+            min-height: 70vh; 
+        }
+
+        /* --- FIL D'ARIANE (MENU) --- */
+        .breadcrumb {
+            margin-bottom: 30px;
+            display: flex; 
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px; 
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            z-index: 10;
+            position: relative;
+        }
+
+        .breadcrumb-btn {
+            display: inline-flex;
             align-items: center;
-            padding: 20px;
-            background-color: #f4f7f6;
-            color: #333;
-        }
-        .container {
+            padding: 8px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 30px;
             background-color: #ffffff;
-            padding: 30px 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 700px;
-            text-align: center;
-        }
-        h1 {
-            color: #007bff;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        .level-selector {
-            margin-bottom: 20px;
-            text-align: left;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f8f9fa;
-        }
-        .level-selector label {
-            margin-right: 15px;
-            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-dark);
             font-weight: 600;
-        }
-        #problem-display {
-            font-size: 2.5em;
-            margin: 40px 0;
-            padding: 20px;
-            background-color: #e9ecef;
-            border-radius: 8px;
-            min-height: 50px;
-            border: 1px dashed #adb5bd;
-        }
-        #answer-display {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            border-radius: 5px;
-            text-align: left;
-            display: none; /* Caché par défaut */
-        }
-        #answer-display strong {
-            display: block;
-            margin-bottom: 10px;
-        }
-        .controls button {
-            padding: 10px 20px;
-            margin: 5px;
-            border: none;
-            border-radius: 5px;
+            font-size: 0.95em;
             cursor: pointer;
-            font-size: 1em;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            user-select: none;
+            position: relative;
+        }
+
+        .breadcrumb-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background-color: #e8f5e9;
+            transform: translateY(-2px);
+        }
+
+        .breadcrumb-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        }
+        
+        .breadcrumb-btn .icon-breadcrumb {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+        
+        /* --- POP-UP D'APERÇU --- */
+        #category-popup {
+            position: absolute;
+            z-index: 100;
+            background-color: #ffffff;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            min-width: 250px;
+            max-width: 350px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, transform 0.3s;
+            transform: translateY(10px);
+            border: 1px solid var(--primary-color);
+            text-align: left;
+        }
+
+        #category-popup.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        #category-popup h3 {
+            color: var(--primary-color);
+            font-size: 1.2em;
+            margin: 0 0 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #eee;
+        }
+
+        #category-popup ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #category-popup li {
+            font-size: 0.9em;
+            padding: 5px 0;
+            border-bottom: 1px dashed #f0f0f0;
+        }
+
+        #category-popup li:last-child {
+            border-bottom: none;
+        }
+
+        #category-popup a {
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: color 0.2s;
+            font-weight: 500;
+        }
+
+        #category-popup a:hover {
+            color: var(--secondary-color);
+        }
+
+
+        /* --- ZONE D'AFFICHAGE --- */
+        #display-area {
+            flex-grow: 1; 
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        /* --- VIDEO CONTAINER (MODIFIÉ) --- */
+        .anim-container {
+            position: relative;
+            /* Largeur flexible pour s'adapter à la vidéo */
+            width: 100%;
+            max-width: 600px; 
+            height: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        /* Style spécifique pour la vidéo */
+        .anim-container video {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* --- PANNEAU D'INFORMATIONS --- */
+        #info-panel {
+            font-size: 1.2em;
+            color: var(--secondary-color);
+            text-align: left;
+            opacity: 0;
+            transform: translateX(30px);
+            animation: fadeInSlideLeft 1s ease-out forwards 0.5s;
+        }
+
+        #info-panel div {
+            margin-bottom: 15px;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        .info-line {
+            display: inline-block;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--primary-color);
+            text-shadow: 
+                1px 1px 0px rgba(0,0,0,0.1),
+                2px 2px 0px rgba(0,0,0,0.08),
+                3px 3px 0px rgba(0,0,0,0.05);
+            transform: rotateY(-15deg) rotateX(5deg) translateX(0);
+            transition: transform 0.3s ease-out;
+        }
+
+        .info-line:hover {
+            transform: rotateY(-10deg) rotateX(2deg) translateX(5px);
+        }
+        
+        #copyright-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-top: 20px;
+            cursor: pointer;
             transition: background-color 0.3s;
         }
-        #generate-btn {
-            background-color: #28a745;
-            color: white;
+        
+        #copyright-btn:hover {
+            background-color: #455a64;
         }
-        #generate-btn:hover {
-            background-color: #218838;
+
+        /* Animation pour le panneau d'infos */
+        @keyframes fadeInSlideLeft {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
         }
-        #solve-btn {
-            background-color: #ffc107;
-            color: #333;
+        
+        /* --- MODAL (Droits d'Auteur) --- */
+        #copyright-modal {
+            display: none; /* Caché par défaut */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding-top: 60px;
+            backdrop-filter: blur(5px); 
         }
-        #solve-btn:hover {
-            background-color: #e0a800;
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto; 
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            animation: fadeInModal 0.3s ease-out;
+            border-top: 8px solid var(--secondary-color);
         }
-        /* Style pour les étapes de solution pour un meilleur rendu */
-        .solution-step {
-            margin: 10px 0;
-            line-height: 1.5;
+        
+        @keyframes fadeInModal {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .solution-step strong {
-            display: inline-block;
-            min-width: 150px; 
-            color: #0056b3;
+
+        .modal-content h3 {
+            color: var(--secondary-color);
+            margin-top: 0;
+            font-size: 1.5em;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .modal-content p {
+            font-size: 0.95em;
+            text-align: justify;
+        }
+        
+        .modal-content strong {
+            color: var(--primary-color);
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #777;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+
+        /* --- SECTIONS CATÉGORIES --- */
+        .category-section {
+            display: none; 
+            width: 100%;
+            animation: slideUp 0.4s ease-out;
+            padding-top: 20px;
+        }
+
+        .category-section.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            border-left: 6px solid var(--primary-color);
+            padding-left: 15px;
+        }
+
+        /* --- LISTE DES LIENS --- */
+        .link-list {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .link-button {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border: 1px solid #eceff1;
+            border-radius: 10px; 
+            background-color: #ffffff;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+
+        .link-button:hover {
+            background-color: #fff;
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.15);
+            transform: translateY(-2px);
+            color: var(--primary-color);
+        }
+
+        .link-button .icon {
+            margin-right: 12px;
+            font-size: 1.4em;
+            color: var(--primary-color);
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            #display-area {
+                flex-direction: column;
+                gap: 30px;
+            }
+            #info-panel {
+                text-align: center;
+                transform: translateX(0);
+                animation: fadeIn 0.8s ease-out forwards 0.5s;
+            }
+            .info-line {
+                transform: none;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            }
+            .container {
+                padding: 20px;
+                min-height: auto;
+            }
+            .anim-container {
+                /* Sur mobile, on prend toute la largeur */
+                width: 100%;
+                max-width: 100%;
+                height: auto;
+            }
+            /* Masquer le pop-up sur les petits écrans pour éviter les problèmes de mise en page */
+            #category-popup {
+                display: none;
+            }
+            .modal-content {
+                margin: 10% auto;
+                width: 95%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔢 Générateur de Calculs Aléatoires</h1>
-        
-        <div class="level-selector">
-            Niveau de difficulté : 
-            <label><input type="radio" name="level" value="1" checked> Niveau 1 (Base)</label>
-            <label><input type="radio" name="level" value="2"> Niveau 2 (Complexe)</label>
-            <label><input type="radio" name="level" value="3"> Niveau 3 (Super-Complexe)</label>
-        </div>
 
-        <p>Problème à résoudre :</p>
-        <div id="problem-display">
+    <div class="container">
+        
+        <div id="breadcrumb" class="breadcrumb">
+            </div>
+        
+        <div id="display-area">
+            
+            <div id="welcome-screen" class="anim-container">
+                <video autoplay loop muted playsinline>
+                    <source src="animation-maths.mp4" type="video/mp4">
+                    Votre navigateur ne supporte pas la balise vidéo.
+                </video>
             </div>
 
-        <div class="controls">
-            <button id="generate-btn">➡️ Nouveau Calcul</button>
-            <button id="solve-btn">✔️ Afficher la Solution</button>
-        </div>
+            <div id="info-panel">
+                <div><span class="info-line">Auteur : Yann Merdy</span></div>
+                <div><span class="info-line">Année 2025 - 2026</span></div>
+                <div><span class="info-line">Première STL & STI2D</span></div>
+                <div><span class="info-line">TRONC COMMUN & PCM</span></div>
+                <button id="copyright-btn">⚖️ Droits d'Auteur</button>
+            </div>
 
-        <div id="answer-display">
-            <strong>Solution (avec étapes) :</strong>
-            <div id="solution-steps"></div>
+            <div id="categories-container" style="width: 100%;"></div>
+
         </div>
+        
+    </div>
+    
+    <div id="category-popup"></div>
+    
+    <div id="copyright-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h3>⚖️ Droits d'Auteur et Licence d'Utilisation</h3>
+        <p>Auteur : <strong>Yann Merdy (yann.merdy@gmail.com)</strong> - Novembre 2025</p>
+        <p><strong>Licence d'Utilisation Non Commerciale</strong></p>
+        <p>Ce code HTML/CSS/JavaScript ainsi que le contenu généré par l'application ("Cours et Exercices Dynamiques : Le Produit Scalaire") sont la propriété intellectuelle exclusive de l'auteur, Yann Merdy.</p>
+        
+        <p><strong>Conditions :</strong></p>
+        <ul>
+            <li><strong>Utilisation Privée et Éducative (Autorisée) :</strong> Vous êtes autorisé.e à utiliser, copier, modifier et distribuer ce code et son contenu **uniquement** à des fins **personnelles, éducatives et non lucratives.**</li>
+            <li><strong>Utilisation Commerciale (Interdite) :</strong> Toute utilisation, distribution, intégration ou reproduction du code ou du contenu (total ou partiel) à des fins **commerciales, lucratives ou professionnelles** est **strictement interdite** sans un accord écrit préalable et explicite de l'auteur.</li>
+            <li><strong>Attribution :</strong> Toute reproduction ou modification doit conserver la mention de l'auteur originale (Yann Merdy) et la présente notice de droits d'auteur.</li>
+        </ul>
+        <p>Pour toute demande d'utilisation commerciale ou de licence spécifique, veuillez contacter l'auteur à l'adresse indiquée ci-dessus.</p>
+      </div>
     </div>
 
+
     <script>
-        // Fonction utilitaire pour le Plus Grand Commun Diviseur (PGCD)
-        function gcd(a, b) {
-            return b ? gcd(b, a % b) : a;
-        }
+        // --- DONNÉES ---
+        const linksData = [
+            // Nouveaux liens ajoutés
+            { url: "https://ldv78100ym-hub.github.io/ALGEBRE_DIVERS/CALCULS.html", title: "Calculs (Algèbre Divers)", category: "Algèbre" },
+            { url: "https://ldv78100ym-hub.github.io/ALGEBRE_DIVERS/EVOLUTIONS.html", title: "Évolutions (Algèbre Divers)", category: "Algèbre" },
+            { url: "https://ldv78100ym-hub.github.io/ALGEBRE_DIVERS/IDENTITES_REMARQUABLES.html", title: "Identités Remarquables (Algèbre Divers)", category: "Algèbre" },
+            // Liens existants
+            { url: "https://ldv78100ym-hub.github.io/TABLEAUX-DE-SIGNES/", title: "Tableaux de Signes", category: "Algèbre" },
+            { url: "https://ldv78100ym-hub.github.io/FACTORISATIONS/", title: "Factorisations", category: "Algèbre" },
+            { url: "https://ldv78100ym-hub.github.io/SECOND_DEGRE/index1.html", title: "Second Degré (Général)", category: "Algèbre" },
+            { url: "https://ldv78100ym-hub.github.io/SECOND_DEGRE/index2.html", title: "Second Degré (Variante)", category: "Algèbre" },
+            { url: "https://ldv78100ym-hub.github.io/DROITES", title: "Droites (Géométrie Analytique)", category: "Analyse" },
+            { url: "https://ldv78100ym-hub.github.io/NOMBRE_DERIVE/", title: "Nombre Dérivé", category: "Analyse" },
+            { url: "https://ldv78100ym-hub.github.io/NOMBRE_DERIVE/CALCULS.html", title: "Calculs de Nombre Dérivé", category: "Analyse" },
+            { url: "https://ldv78100ym-hub.github.io/PRODUIT_SCALAIRE/", title: "Produit Scalaire", category: "Géométrie" },
+            { url: "https://ldv78100ym-hub.github.io/PROBABILITES/", title: "Probabilités", category: "Probabilités" },
+            { url: "https://ldv78100ym-hub.github.io/SECOND_DEGRE/index_jeux.html", title: "Jeux Mathématiques (Second Degré)", category: "JEUX" },
+            { url: "https://ldv78100ym-hub.github.io/JEUX-MATH-MATIQUES-/PRODUIT_SCALAIRE_JEUX.html", title: "Produit Scalaire (Quête)", category: "JEUX" } 
+        ];
         
-        // Fonction utilitaire pour le Plus Petit Commun Multiple (PPCM)
-        function lcm(a, b) {
-            if (a === 0 || b === 0) return 0;
-            return Math.abs(a * b) / gcd(a, b);
+        // Regrouper les liens une seule fois au chargement pour le pop-up
+        const groupedLinks = linksData.reduce((acc, link) => {
+            if (!acc[link.category]) acc[link.category] = [];
+            acc[link.category].push(link);
+            return acc;
+        }, {});
+
+
+        // --- UTILITAIRES DE PAGE ---
+        function sanitizeId(text) {
+            return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
         }
 
-        // Fonction pour simplifier une fraction [num, den]
-        function simplifyFraction(num, den) {
-            if (den === 0) return [num, 0];
-            if (num === 0) return [0, 1];
-            
-            const g = gcd(Math.abs(num), Math.abs(den));
-            let newNum = num / g;
-            let newDen = den / g;
-            
-            if (newDen < 0) {
-                newNum = -newNum;
-                newDen = -newDen;
-            }
-            return [newNum, newDen];
+        function getCategoryIcon(category) {
+            if (category === "Algèbre") return '➗';
+            if (category === "Géométrie") return '📐';
+            if (category === "Probabilités") return '🎲';
+            if (category === "JEUX") return '🎮'; // Icône pour les jeux
+            return '📈';
         }
 
-        // Représente un nombre qui peut être entier ou fractionnaire
-        class NumberValue {
-            constructor(numerator, denominator = 1) {
-                [this.numerator, this.denominator] = simplifyFraction(numerator, denominator);
-            }
+        // --- GESTION POP-UP ---
+        const popup = document.getElementById('category-popup');
 
-            isNegative() {
-                return this.numerator < 0;
-            }
+        function showPopup(categoryName, event) {
+            if (window.innerWidth <= 768) return; 
 
-            isOne() {
-                return this.numerator === 1 && this.denominator === 1;
-            }
+            const links = groupedLinks[categoryName] || [];
+            if (links.length === 0) return;
 
-            isMinusOne() {
-                return this.numerator === -1 && this.denominator === 1;
-            }
-            
-            // Convertit en string LaTeX. Utilise \dfrac pour les fractions.
-            toLatex(wrap = false) {
-                let str;
-                if (this.denominator === 1) {
-                    str = `${this.numerator}`;
-                } else if (this.denominator === 0) {
-                    str = `\\text{ERREUR}`;
-                } else {
-                    // Utiliser \dfrac pour une meilleure lisibilité
-                    str = `\\dfrac{${this.numerator}}{${this.denominator}}`;
-                }
-
-                // Ajoute des parenthèses si 'wrap' est vrai ET (le nombre est négatif OU une fraction OU si c'est -1)
-                if (wrap && (this.isNegative() || this.denominator !== 1 || this.isMinusOne())) {
-                    return `\\left(${str}\\right)`; 
-                }
-                
-                return str;
-            }
-            
-            toValue() {
-                return this.numerator / this.denominator;
-            }
-            
-            add(other) {
-                const num = this.numerator * other.denominator + other.numerator * this.denominator;
-                const den = this.denominator * other.denominator;
-                return new NumberValue(num, den);
-            }
-
-            subtract(other) {
-                const num = this.numerator * other.denominator - other.numerator * this.denominator;
-                const den = this.denominator * other.denominator;
-                return new NumberValue(num, den);
-            }
-            
-            multiply(other) {
-                const num = this.numerator * other.numerator;
-                const den = this.denominator * other.denominator;
-                return new NumberValue(num, den);
-            }
-
-            // Division (multiplication par l'inverse)
-            divide(other) {
-                if (other.numerator === 0) {
-                    return new NumberValue(0, 1);
-                }
-                const num = this.numerator * other.denominator;
-                const den = this.denominator * other.numerator;
-                return new NumberValue(num, den);
-            }
-            
-            power(exp) {
-                if (exp === 0) return new NumberValue(1, 1);
-                if (exp < 0) {
-                    const inv = new NumberValue(this.denominator, this.numerator);
-                    return inv.power(-exp);
-                }
-                
-                const num = Math.pow(this.numerator, exp);
-                const den = Math.pow(this.denominator, exp);
-                return new NumberValue(num, den);
-            }
-        }
-
-        function generateRandomNumber() {
-            const isFraction = Math.random() < 0.4;
-            
-            if (isFraction) {
-                let num = Math.floor(Math.random() * 10) + 1; 
-                let den = Math.floor(Math.random() * 9) + 2;
-                
-                if (num % den === 0) { num = Math.floor(Math.random() * 10) + 1; }
-                if (Math.random() < 0.3) num = -num;
-                
-                return new NumberValue(num, den);
-            } else {
-                let num = Math.floor(Math.random() * 15) + 1;
-                if (Math.random() < 0.1) num = 1; 
-                else if (Math.random() < 0.1) num = -1;
-                else if (Math.random() < 0.3) num = -num;
-                
-                return new NumberValue(num, 1);
-            }
-        }
-
-        /**
-         * Génère les étapes de l'addition ou soustraction de fractions avec le dénominateur commun en couleur.
-         */
-        function generateAdditionSteps(B, C, operator, finalResult) {
-            let steps = [];
-
-            if (B.denominator !== 1 || C.denominator !== 1) {
-                const denB = B.denominator;
-                const denC = C.denominator;
-                const commonDen = lcm(denB, denC);
-
-                const B_factor = commonDen / denB;
-                const C_factor = commonDen / denC;
-
-                const numB_new = B.numerator * B_factor;
-                const numC_new = C.numerator * C_factor;
-                
-                // Étape 1: Mise au même dénominateur (avec facteurs de couleur bleue)
-                const B_display = B_factor === 1 ? B.toLatex(false) : `\\dfrac{${B.numerator} \\times \\color{blue}{${B_factor}}}{${B.denominator} \\times \\color{blue}{${B_factor}}}`;
-                
-                let C_content = `\\dfrac{${C.numerator} \\times \\color{blue}{${C_factor}}}{${C.denominator} \\times \\color{blue}{${C_factor}}}`;
-                const C_display = (C_factor === 1 && !C.isNegative() && C.denominator === 1) ? C.toLatex(true) : `\\left( ${C_content} \\right)`;
-                
-                steps.push(`Mise au même dénominateur: ${B_display} ${operator} ${C_display}`);
-                
-                // Étape 2: Calcul sur les numérateurs (Gestion des double-signes)
-                
-                let numerator_calc;
-                if (operator === '-' && numC_new < 0) {
-                    numerator_calc = `${numB_new} + ${Math.abs(numC_new)}`;
-                } else if (operator === '+' && numC_new < 0) {
-                    numerator_calc = `${numB_new} - ${Math.abs(numC_new)}`;
-                } else {
-                    numerator_calc = `${numB_new} ${operator} ${numC_new}`;
-                }
-                
-                const resultStepLatex = `\\dfrac{${numerator_calc}}{\\color{red}{${commonDen}}} = ${finalResult.toLatex()}`;
-                steps.push(`Calcul sur fractions: ${resultStepLatex}`);
-                
-            } else {
-                // Si entiers
-                steps.push(`Addition/Soustraction: ${B.toLatex()} ${operator} ${C.toLatex(true)} = ${finalResult.toLatex()}`);
-            }
-
-            return steps;
-        }
-        
-        /**
-         * Applique aléatoirement une puissance (2 ou 3) à un terme.
-         */
-        function applyRandomPower(term) {
-            if (Math.random() < 0.3) {
-                const exp = Math.floor(Math.random() * 2) + 2; 
-                const result = term.power(exp);
-                const termLatex = term.toLatex(true);
-                const stepLatex = `${termLatex}^{${exp}} = ${result.toLatex()}`;
-                return { value: result, latex: `${termLatex}^{${exp}}`, steps: [`Puissance: ${stepLatex}`] };
-            }
-            return { value: term, latex: term.toLatex(false), steps: [] }; 
-        }
-
-        /**
-         * Génère une expression complexe entre parenthèses, de la forme (A [op] B)^n.
-         * La division est toujours représentée par une fraction dans le LaTeX final.
-         */
-        function generateInnerExpression() {
-            let steps = [];
-
-            let A_term = applyRandomPower(generateRandomNumber());
-            let B_term = applyRandomPower(generateRandomNumber());
-
-            steps.push(...A_term.steps);
-            steps.push(...B_term.steps);
-
-            let A = A_term.value;
-            let B = B_term.value;
-            let A_latex = A_term.latex;
-            let B_latex = B_term.latex;
-
-            const operations = ['+', '-', 'mult', 'div'];
-            const op_type = operations[Math.floor(Math.random() * operations.length)];
-            const op_symbol = op_type === 'mult' ? '\\times' : op_type === 'div' ? '\\div' : op_type;
-
-            let result;
-            let innerLatex;
-
-            switch (op_type) {
-                case '+':
-                case '-':
-                    result = (op_type === '+') ? A.add(B) : A.subtract(B);
-                    steps.push(...generateAdditionSteps(A, B, op_type, result));
-                    innerLatex = `${A_latex} ${op_type} ${B_latex}`;
-                    break;
-                case 'mult':
-                    result = A.multiply(B);
-                    if (!A.isOne() || !B.isOne()) {
-                        if (A.isMinusOne() || B.isMinusOne()) {
-                            let otherTerm = A.isMinusOne() ? B : A;
-                            steps.push(`Multiplication (Changement de signe): - ${otherTerm.toLatex(true)} = ${result.toLatex()}`);
-                        } else if (!A.isOne() && !B.isOne()) {
-                            steps.push(`Multiplication: ${A.toLatex(true)} \\times ${B.toLatex(true)} = ${result.toLatex()}`);
-                        }
-                    }
-                    innerLatex = `${A_latex} \\times ${B_latex}`;
-                    break;
-                case 'div':
-                    if (B.numerator === 0) { B = new NumberValue(Math.floor(Math.random() * 5) + 1); }
-                    result = A.divide(B);
-                    
-                    let mainStepLatex = `Division (Fraction): \\dfrac{${A.toLatex(false)}}{${B.toLatex(false)}} = ${result.toLatex()}`; 
-                    steps.push(mainStepLatex);
-                    
-                    innerLatex = `\\dfrac{${A_latex}}{${B_latex}}`; 
-                    break;
-            }
-
-            // Application de la puissance sur le résultat de la parenthèse
-            let finalResult = result;
-            let finalLatex;
-
-            if (Math.random() < 0.15) {
-                const exp = Math.floor(Math.random() * 2) + 2;
-                finalResult = result.power(exp);
-                const stepLatex = `\\left(${result.toLatex(false)}\\right)^{${exp}} = ${finalResult.toLatex()}`;
-                steps.push(`Puissance (parenthèse): ${stepLatex}`);
-                
-                finalLatex = `\\left( ${innerLatex} \\right)^{${exp}}`;
-            } else {
-                 if (op_type === 'div') {
-                    finalLatex = innerLatex;
-                 } else {
-                    finalLatex = `\\left( ${innerLatex} \\right)`; 
-                 }
-            }
-
-            return { result: finalResult, latex: finalLatex, steps: steps, op_type: op_type };
-        }
-
-
-        // --- NIVEAU 1 : A * B^n +/- C ---
-        function generateSimpleProblem() {
-            let steps = [];
-
-            const A = generateRandomNumber();
-            let B_term;
-            let resultBeforeAddition;
-            let problemLatexBeforeC = A.toLatex();
-            
-            const usePower = Math.random() < 0.5;
-            let exponent = 0;
-
-            if (usePower) {
-                const B = generateRandomNumber();
-                exponent = Math.floor(Math.random() * 2) + 2;
-                
-                const bLatexWrapped = B.toLatex(true); 
-                problemLatexBeforeC = `${A.toLatex()} \\times ${bLatexWrapped}^{${exponent}}`;
-                
-                const B_power = B.power(exponent);
-                steps.push(`Puissance: ${B.toLatex(true)} ^{${exponent}} = ${B_power.toLatex()}`);
-                
-                resultBeforeAddition = A.multiply(B_power);
-                B_term = resultBeforeAddition;
-
-                if (!A.isOne() || !B_power.isOne()) {
-                    if (A.isMinusOne() || B_power.isMinusOne()) {
-                        let otherTerm = A.isMinusOne() ? B_power : A;
-                        steps.push(`Changement de signe (Multiplication par -1): - ${otherTerm.toLatex()} = ${resultBeforeAddition.toLatex()}`);
-                    } else if (!A.isOne() && !B_power.isOne()) {
-                        steps.push(`Multiplication: ${A.toLatex()} \\times ${B_power.toLatex(true)} = ${resultBeforeAddition.toLatex()}`);
-                    }
-                }
-                
-            } else {
-                const B = generateRandomNumber();
-                
-                resultBeforeAddition = A.multiply(B);
-                B_term = resultBeforeAddition;
-                
-                if (!A.isOne() || !B.isOne()) {
-                    if (A.isMinusOne() || B.isMinusOne()) {
-                        let otherTerm = A.isMinusOne() ? B : A;
-                        problemLatexBeforeC = `${A.toLatex()} \\times ${B.toLatex(true)}`;
-                        steps.push(`Changement de signe (Multiplication par -1): - ${otherTerm.toLatex()} = ${resultBeforeAddition.toLatex()}`);
-                    } else if (!A.isOne() && !B.isOne()) {
-                        problemLatexBeforeC = `${A.toLatex()} \\times ${B.toLatex(true)}`;
-                        steps.push(`Multiplication: ${A.toLatex()} \\times ${B.toLatex(true)} = ${resultBeforeAddition.toLatex()}`);
-                    }
-                } else {
-                    problemLatexBeforeC = B.toLatex();
-                }
-            }
-            
-            const C = generateRandomNumber();
-            const operator = Math.random() < 0.5 ? "+" : "-";
-            
-            const latex = `${problemLatexBeforeC} ${operator} ${C.toLatex(true)}`;
-            
-            const finalResult = (operator === '+') ? B_term.add(C) : B_term.subtract(C);
-            steps.push(...generateAdditionSteps(B_term, C, operator, finalResult));
-
-            return { latex, steps, result: finalResult.toLatex() };
-        }
-
-        // --- NIVEAU 2 : (A/B +/- C) * D^n  OU  (A +/- B/C) * D^n ---
-        function generateComplexProblem() {
-            let steps = [];
-
-            const N1 = generateRandomNumber();
-            const N2 = generateRandomNumber();
-            const N3 = generateRandomNumber();
-            let D = generateRandomNumber(); 
-            
-            // Choisir si la division est le premier terme ou le deuxième
-            const division_first = Math.random() < 0.5;
-            
-            let term1;
-            let term2;
-
-            // 1. Calcul de la division (qui est le terme complexe interne)
-            if (division_first) { // (N1/N2 +/- N3) * D^n
-                term1 = N1.divide(N2);
-                term2 = N3;
-                steps.push(`Division interne (Terme 1): \\dfrac{${N1.toLatex(false)}}{${N2.toLatex(false)}} = ${term1.toLatex()}`);
-            } else { // (N1 +/- N2/N3) * D^n
-                term1 = N1;
-                term2 = N2.divide(N3);
-                steps.push(`Division interne (Terme 2): \\dfrac{${N2.toLatex(false)}}{${N3.toLatex(false)}} = ${term2.toLatex()}`);
-            }
-            
-            // 2. Addition/Soustraction (Opération prioritaire entre parenthèses)
-            const operator = Math.random() < 0.5 ? "+" : "-";
-            const innerCalculation = (operator === '+') ? term1.add(term2) : term1.subtract(term2);
-            
-            steps.push(`Résolution de la parenthèse: ${term1.toLatex(false)} ${operator} ${term2.toLatex(true)}`);
-            steps.push(...generateAdditionSteps(term1, term2, operator, innerCalculation));
-
-            // Construction LaTeX interne
-            const innerExpressionLatex = `\\left(${division_first ? term1.toLatex(false) : term1.toLatex(false)} ${operator} ${division_first ? N3.toLatex(true) : term2.toLatex(true)}\\right)`;
-
-
-            // 3. Multiplication/Puissance avec D
-            const usePower = Math.random() < 0.6;
-            let finalResult;
-            let D_term_latex = "";
-            let D_factor; 
-            
-            if (usePower) {
-                const exponent = Math.floor(Math.random() * 2) + 2;
-                
-                const D_power = D.power(exponent);
-                steps.push(`Puissance: ${D.toLatex(true)} ^{${exponent}} = ${D_power.toLatex()}`);
-
-                D_factor = D_power;
-                D_term_latex = `${D.toLatex(true)}^{${exponent}}`;
-
-            } else {
-                D_factor = D;
-                D_term_latex = D.toLatex(true);
-            }
-            
-            // Calcul final (Multiplication)
-            finalResult = innerCalculation.multiply(D_factor);
-                
-            // Documentation de l'étape de multiplication finale
-            if (!D_factor.isOne() || !innerCalculation.isOne()) {
-                if (D_factor.isMinusOne() || innerCalculation.isMinusOne()) {
-                    let otherTerm = innerCalculation.isMinusOne() ? D_factor : innerCalculation;
-                    steps.push(`Multiplication Finale (Changement de signe): - ${otherTerm.toLatex(true)} = ${finalResult.toLatex()}`);
-                } else if (!D_factor.isOne() && !innerCalculation.isOne()) {
-                    steps.push(`Multiplication Finale: ${innerCalculation.toLatex(true)} \\times ${D_factor.toLatex(true)} = ${finalResult.toLatex()}`);
-                }
-            }
-            
-            let latex = `${innerExpressionLatex} \\times ${D_term_latex}`;
-            
-            if (D_factor.isOne()) {
-                latex = innerExpressionLatex;
-            }
-
-            return { latex, steps, result: finalResult.toLatex() };
-        }
-
-        // --- NIVEAU 3 : (Opération Aléatoire avec Puissance) [Op] (Opération Aléatoire avec Puissance) ---
-        function generateSuperComplexProblem() {
-            
-            const P1 = generateInnerExpression();
-            const P2 = generateInnerExpression();
-
-            const P1_result = P1.result;
-            const P2_result = P2.result;
-
-            let steps = P1.steps.map(s => `Parenthèse 1: ${s}`);
-            steps.push(...P2.steps.map(s => `Parenthèse 2: ${s}`));
-
-            const outer_operations = ['+', '-', 'mult', 'div'];
-            const outer_op_type = outer_operations[Math.floor(Math.random() * outer_operations.length)];
-            const outer_op_symbol = outer_op_type === 'mult' ? '\\times' : outer_op_type === 'div' ? '' : outer_op_type;
-
-            let finalResult;
-            let latex;
-
-            switch (outer_op_type) {
-                case '+':
-                case '-':
-                    const op = outer_op_type;
-                    finalResult = (op === '+') ? P1_result.add(P2_result) : P1_result.subtract(P2_result);
-                    steps.push(...generateAdditionSteps(P1_result, P2_result, op, finalResult).map(s => `Opération Finale (${op}): ${s}`));
-                    latex = `${P1.latex} ${outer_op_symbol} ${P2.latex}`;
-                    break;
-                case 'mult':
-                    finalResult = P1_result.multiply(P2_result);
-                    
-                    if (!P1_result.isOne() || !P2_result.isOne()) {
-                        let finalStepLatex = `Multiplication: ${P1_result.toLatex(true)} \\times ${P2_result.toLatex(true)} = ${finalResult.toLatex()}`;
-                        steps.push(`Opération Finale: ${finalStepLatex}`);
-                    }
-                    latex = `${P1.latex} ${outer_op_symbol} ${P2.latex}`;
-                    break;
-                case 'div':
-                    if (P2_result.numerator === 0) {
-                        finalResult = new NumberValue(0, 1);
-                    } else {
-                        finalResult = P1_result.divide(P2_result);
-                    }
-                    
-                    let finalStepLatex = `\\dfrac{${P1_result.toLatex(false)}}{${P2_result.toLatex(false)}} = ${finalResult.toLatex()}`; 
-                    steps.push(`Opération Finale (Fraction): ${finalStepLatex}`);
-
-                    // Construction LaTeX finale (en grande fraction)
-                    latex = `\\dfrac{${P1.latex}}{${P2.latex}}`;
-                    break;
-            }
-            
-            return { latex, steps, result: finalResult.toLatex() };
-        }
-
-
-        // --- FONCTION PRINCIPALE D'AFFICHAGE ---
-        function updateDisplay() {
-            const level = document.querySelector('input[name="level"]:checked').value;
-            let problemData;
-
-            if (level === '1') {
-                problemData = generateSimpleProblem();
-            } else if (level === '2') {
-                problemData = generateComplexProblem();
-            } else { // level === '3'
-                problemData = generateSuperComplexProblem();
-            }
-
-            const { latex, steps, result } = problemData;
-            
-            const problemDisplay = document.getElementById('problem-display');
-            problemDisplay.innerHTML = `$$${latex}$$`;
-            
-            
-            const answerContainer = document.getElementById('answer-display');
-            let oldSolutionDiv = document.getElementById('solution-steps');
-            
-            // 1. Supprimer et recréer l'élément de solution pour un rendu propre
-            if (oldSolutionDiv) {
-                if (window.MathJax && window.MathJax.typesetClear) {
-                    MathJax.typesetClear([oldSolutionDiv]);
-                }
-                oldSolutionDiv.remove();
-            }
-
-            let newSolutionDiv = document.createElement('div');
-            newSolutionDiv.id = 'solution-steps';
-            newSolutionDiv.style.textAlign = 'left';
-            
-            // 2. Préparer le contenu HTML/LaTeX avec une structure par étape (structure robuste)
-            let solutionHtml = '';
-
-            steps.forEach(step => {
-                const parts = step.split(': ');
-                const textPart = parts[0];
-                const latexPart = parts.slice(1).join(': '); 
-
-                solutionHtml += `<div class="solution-step">`;
-                solutionHtml += `&triangleright; <strong>${textPart.trim()}</strong>: `;
-                // Mode mathématique en ligne \( ... \) pour le LaTeX
-                solutionHtml += `\\(${latexPart}\\)`; 
-                solutionHtml += `</div>`;
+            let contentHTML = `<h3>${categoryName}</h3><ul>`;
+            links.forEach(link => {
+                contentHTML += `<li><a href="${link.url}" target="_blank">${link.title}</a></li>`;
             });
-
-            // Ajout du résultat final
-            solutionHtml += `<div class="solution-step">`;
-            solutionHtml += `&triangleright; <strong>Résultat Final</strong>: `;
-            solutionHtml += `\\(${result}\\)`; 
-            solutionHtml += `</div>`;
-
-            newSolutionDiv.innerHTML = solutionHtml;
-            answerContainer.appendChild(newSolutionDiv);
+            contentHTML += `</ul>`;
             
-            // 3. Forcer le rendu MathJax sur les deux éléments (Problème et Solution)
-            if (window.MathJax) {
-                MathJax.typesetPromise([problemDisplay, newSolutionDiv]).then(() => {
-                    answerContainer.style.display = 'none';
-                });
-            } else {
-                answerContainer.style.display = 'none';
+            popup.innerHTML = contentHTML;
+
+            const buttonRect = event.currentTarget.getBoundingClientRect();
+            const containerRect = document.querySelector('.container').getBoundingClientRect();
+            
+            const topPosition = buttonRect.bottom + window.scrollY - containerRect.top + 10;
+            const leftPosition = buttonRect.left + window.scrollX - containerRect.left;
+            
+            popup.style.top = `${topPosition}px`;
+            popup.style.left = `${leftPosition}px`;
+            
+            const popUpWidth = popup.offsetWidth;
+            const containerWidth = containerRect.width;
+
+            if (leftPosition + popUpWidth > containerWidth) {
+                popup.style.left = `${containerWidth - popUpWidth - 40}px`; 
             }
+            
+            popup.classList.add('visible');
         }
 
-        // --- INITIALISATION ET ÉVÉNEMENTS ---
+        function hidePopup() {
+            popup.classList.remove('visible');
+        }
 
-        document.getElementById('generate-btn').addEventListener('click', updateDisplay);
-
-        // Déclencher un nouveau calcul si le niveau change
-        document.querySelectorAll('input[name="level"]').forEach(radio => {
-            radio.addEventListener('change', updateDisplay);
-        });
-
-        document.getElementById('solve-btn').addEventListener('click', function() {
-            const answerDisplay = document.getElementById('answer-display');
-            answerDisplay.style.display = (answerDisplay.style.display === 'none' || answerDisplay.style.display === '') ? 'block' : 'none';
-        });
-
-        // Initialisation: S'assurer que MathJax est prêt.
-        window.onload = function() {
-            if (window.MathJax) {
-                window.MathJax.startup.promise.then(updateDisplay);
-            } else {
-                updateDisplay();
+        // --- NAVIGATION ---
+        function switchCategory(targetId) {
+            // Masquer l'écran d'accueil
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const infoPanel = document.getElementById('info-panel');
+            
+            // Masquer la vidéo et le panneau d'infos
+            if (welcomeScreen.style.display !== 'none') {
+                welcomeScreen.style.display = 'none';
+                infoPanel.style.display = 'none';
             }
-        };
+
+            // Masquer toutes les sections
+            document.querySelectorAll('.category-section').forEach(el => el.classList.remove('active'));
+            
+            // Désactiver tous les boutons
+            document.querySelectorAll('.breadcrumb-btn').forEach(el => el.classList.remove('active'));
+
+            // Activer la section cible
+            const targetSection = document.getElementById('section-' + targetId);
+            if (targetSection) targetSection.classList.add('active');
+
+            // Activer le bouton cible
+            const targetBtn = document.getElementById('btn-' + targetId);
+            if (targetBtn) targetBtn.classList.add('active');
+        }
+
+        // --- GESTION MODALE DROITS D'AUTEUR ---
+        const modal = document.getElementById('copyright-modal');
+        const btn = document.getElementById("copyright-btn");
+        const span = document.getElementsByClassName("close-btn")[0];
+
+        // Quand l'utilisateur clique sur le bouton, ouvrir la modale 
+        btn.onclick = function() {
+          modal.style.display = "block";
+        }
+
+        // Quand l'utilisateur clique sur (x), fermer la modale
+        span.onclick = function() {
+          modal.style.display = "none";
+        }
+
+        // Quand l'utilisateur clique n'importe où en dehors de la modale, la fermer
+        window.onclick = function(event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        }
+
+
+        // --- INITIALISATION ---
+        function initPage() {
+            const breadcrumbContainer = document.getElementById('breadcrumb');
+            const categoriesContainer = document.getElementById('categories-container');
+            
+            categoriesContainer.innerHTML = '';
+            
+            const categories = Object.keys(groupedLinks);
+            if (categories.length === 0) return;
+
+            categories.forEach(category => {
+                const safeId = sanitizeId(category);
+                const icon = getCategoryIcon(category);
+
+                // Bouton Menu
+                const btn = document.createElement('a');
+                btn.href = "#"; 
+                btn.className = 'breadcrumb-btn';
+                btn.id = 'btn-' + safeId;
+                btn.innerHTML = `<span class="icon-breadcrumb">${icon}</span> ${category}`;
+                
+                btn.addEventListener('mouseenter', (e) => showPopup(category, e));
+                btn.addEventListener('mouseleave', hidePopup);
+                
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchCategory(safeId);
+                });
+
+                breadcrumbContainer.appendChild(btn);
+
+                // Section Contenu
+                const section = document.createElement('div');
+                section.className = 'category-section';
+                section.id = 'section-' + safeId;
+
+                const title = document.createElement('h2');
+                title.textContent = category;
+                section.appendChild(title);
+
+                const ul = document.createElement('ul');
+                ul.className = 'link-list';
+
+                groupedLinks[category].forEach(link => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <a href="${link.url}" class="link-button" target="_blank">
+                            <span class="icon">${icon}</span>
+                            <span>${link.title}</span>
+                        </a>
+                    `;
+                    ul.appendChild(li);
+                });
+
+                section.appendChild(ul);
+                categoriesContainer.appendChild(section);
+            });
+            
+            // Suppression de l'appel à initAnimation() car remplacé par la vidéo
+        }
+
+        document.addEventListener('DOMContentLoaded', initPage);
+
     </script>
+
 </body>
 </html>
