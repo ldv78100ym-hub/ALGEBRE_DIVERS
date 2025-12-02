@@ -198,7 +198,7 @@
                             \\text{Valeur d'arrivée} = \\text{Valeur de départ} \\times (1 + t_1) \\times (1 + t_2) \\times ...
                             \\]
                             <p>Les coefficients multiplicateurs sont :</p>
-                            ${evolutions.map(e => `\\( C_{${evolutions.indexOf(e)+1}} = 1 + \\frac{${e}}{100} = ${arrondir(1 + e/100, 4)} \\)`).join('<br>')}
+                            ${evolutions.map(e => `\\( C_{${evolutions.indexOf(e)+1}} = 1 + \\dfrac{${e}}{100} = ${arrondir(1 + e/100, 4)} \\)`).join('<br>')}
                             <p>Le coefficient multiplicateur global est :</p>
                             \\[
                             C_{global} = ${coeffMultiplicateurs.map(c => arrondir(c, 4)).join(' \\times ')} = ${arrondir(coeffGlobal, 4)}
@@ -221,7 +221,7 @@
                             <h4>Correction détaillée :</h4>
                             <p>On utilise la formule des évolutions successives en inversant le calcul :</p>
                             \\[
-                            \\text{Valeur de départ} = \\frac{\\text{Valeur d'arrivée}}{C_{global}}
+                            \\text{Valeur de départ} = \\dfrac{\\text{Valeur d'arrivée}}{C_{global}}
                             \\]
                             <p>Le coefficient multiplicateur global est :</p>
                             \\[
@@ -229,7 +229,7 @@
                             \\]
                             <p>On calcule la valeur de départ :</p>
                             \\[
-                            \\text{Valeur de départ} = \\frac{${valeurArrivee}}{${arrondir(coeffGlobal, 4)}} = ${valeurDepart}
+                            \\text{Valeur de départ} = \\dfrac{${valeurArrivee}}{${arrondir(coeffGlobal, 4)}} = ${valeurDepart}
                             \\]
                         `;
                     }
@@ -256,7 +256,7 @@
                         
                         correction = `
                             <h4>Correction détaillée :</h4>
-                            <p>Soit \\( C_x = 1 + \\frac{x}{100} \\) le coefficient multiplicateur de l'évolution manquante. On a :</p>
+                            <p>Soit \\( C_x = 1 + \\dfrac{x}{100} \\) le coefficient multiplicateur de l'évolution manquante. On a :</p>
                             \\[
                             \\text{Valeur de départ} \\times C_{global} = \\text{Valeur d'arrivée}
                             \\]
@@ -269,7 +269,7 @@
                             \\]
                             <p>On isole \\( C_x \\) :</p>
                             \\[
-                            C_x = \\frac{${valeurArrivee}}{${valeurDepart} \\times ${arrondir(coeffGlobalConnu, 4)}} = ${arrondir(coeffGlobal, 4)}
+                            C_x = \\dfrac{${valeurArrivee}}{${valeurDepart} \\times ${arrondir(coeffGlobalConnu, 4)}} = ${arrondir(coeffGlobal, 4)}
                             \\]
                             <p>On trouve \\( x \\) en utilisant la formule \\( x = 100 \\times (C_x - 1) \\) :</p>
                             \\[
@@ -297,10 +297,10 @@
                             \\]
                             <p>Ensuite, on utilise la formule du coefficient multiplicateur moyen \\( C_{moyen} \\) :</p>
                             \\[
-                            C_{moyen} = (C_{global})^{\\frac{1}{n}} \\qquad (\\text{où } n = \\text{nombre d'évolutions})
+                            C_{moyen} = (C_{global})^{\\dfrac{1}{n}} \\qquad (\\text{où } n = \\text{nombre d'évolutions})
                             \\]
                             \\[
-                            C_{moyen} = (${arrondir(coeffGlobal, 4)})^{\\frac{1}{${nombreEvolutions}}} = ${arrondir(Math.pow(coeffGlobal, 1/nombreEvolutions), 4)}
+                            C_{moyen} = (${arrondir(coeffGlobal, 4)})^{\\dfrac{1}{${nombreEvolutions}}} = ${arrondir(Math.pow(coeffGlobal, 1/nombreEvolutions), 4)}
                             \\]
                             <p>Enfin, on trouve le taux d'évolution moyen \\( t_m \\) :</p>
                             \\[
@@ -344,3 +344,4 @@
     </script>
 </body>
 </html>
+
