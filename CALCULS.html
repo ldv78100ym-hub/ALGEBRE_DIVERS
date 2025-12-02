@@ -2,668 +2,447 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mathématiques - Accueil Dynamique</title>
+    <title>Générateur de Calculs Aléatoires</title>
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <style>
-        /* --- VARIABLES --- */
-        :root {
-            --primary-color: #4CAF50; 
-            --secondary-color: #607D8B;
-            --text-dark: #263238;
-            --container-bg: #ffffff;
-            --border-radius: 12px;
-            --shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        /* --- FOND D'ÉCRAN ANIMÉ --- */
-        @keyframes backgroundTransition {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
         body {
-            font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            color: var(--text-dark);
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex; 
-            justify-content: center;
-            align-items: flex-start;
-            padding-top: 30px; 
-            padding-bottom: 30px;
-            overflow-x: hidden; 
-            
-            background: linear-gradient(-45deg, #e0f2f1, #e3f2fd, #fce4ec, #fcfbe3); 
-            background-size: 400% 400%;
-            animation: backgroundTransition 15s ease infinite;
-        }
-
-        .container {
-            max-width: 1000px;
-            width: 100%;
-            background-color: var(--container-bg);
-            padding: 40px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            position: relative;
-            
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
-            min-height: 70vh; 
-        }
-
-        /* --- FIL D'ARIANE (MENU) --- */
-        .breadcrumb {
-            margin-bottom: 30px;
-            display: flex; 
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 12px; 
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            z-index: 10;
-            position: relative;
-        }
-
-        .breadcrumb-btn {
-            display: inline-flex;
             align-items: center;
-            padding: 8px 16px;
-            border: 1px solid #e0e0e0;
-            border-radius: 30px;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
             background-color: #ffffff;
-            text-decoration: none;
-            color: var(--text-dark);
-            font-weight: 600;
-            font-size: 0.95em;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            user-select: none;
-            position: relative;
-        }
-
-        .breadcrumb-btn:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-            background-color: #e8f5e9;
-            transform: translateY(-2px);
-        }
-
-        .breadcrumb-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
-        }
-        
-        .breadcrumb-btn .icon-breadcrumb {
-            margin-right: 8px;
-            font-size: 1.2em;
-        }
-        
-        /* --- POP-UP D'APERÇU --- */
-        #category-popup {
-            position: absolute;
-            z-index: 100;
-            background-color: #ffffff;
-            border-radius: var(--border-radius);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            min-width: 250px;
-            max-width: 350px;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, transform 0.3s;
-            transform: translateY(10px);
-            border: 1px solid var(--primary-color);
-            text-align: left;
-        }
-
-        #category-popup.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        #category-popup h3 {
-            color: var(--primary-color);
-            font-size: 1.2em;
-            margin: 0 0 10px 0;
-            padding-bottom: 5px;
-            border-bottom: 2px solid #eee;
-        }
-
-        #category-popup ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        #category-popup li {
-            font-size: 0.9em;
-            padding: 5px 0;
-            border-bottom: 1px dashed #f0f0f0;
-        }
-
-        #category-popup li:last-child {
-            border-bottom: none;
-        }
-
-        #category-popup a {
-            color: var(--text-dark);
-            text-decoration: none;
-            transition: color 0.2s;
-            font-weight: 500;
-        }
-
-        #category-popup a:hover {
-            color: var(--secondary-color);
-        }
-
-
-        /* --- ZONE D'AFFICHAGE --- */
-        #display-area {
-            flex-grow: 1; 
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 40px;
-            flex-wrap: wrap;
-        }
-
-        /* --- VIDEO CONTAINER (MODIFIÉ) --- */
-        .anim-container {
-            position: relative;
-            /* Largeur flexible pour s'adapter à la vidéo */
-            width: 100%;
-            max-width: 600px; 
-            height: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        
-        /* Style spécifique pour la vidéo */
-        .anim-container video {
-            width: 100%;
-            height: auto;
+            padding: 30px 40px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        /* --- PANNEAU D'INFORMATIONS --- */
-        #info-panel {
-            font-size: 1.2em;
-            color: var(--secondary-color);
-            text-align: left;
-            opacity: 0;
-            transform: translateX(30px);
-            animation: fadeInSlideLeft 1s ease-out forwards 0.5s;
-        }
-
-        #info-panel div {
-            margin-bottom: 15px;
-            perspective: 1000px;
-            transform-style: preserve-3d;
-        }
-
-        .info-line {
-            display: inline-block;
-            font-weight: 600;
-            line-height: 1.4;
-            color: var(--primary-color);
-            text-shadow: 
-                1px 1px 0px rgba(0,0,0,0.1),
-                2px 2px 0px rgba(0,0,0,0.08),
-                3px 3px 0px rgba(0,0,0,0.05);
-            transform: rotateY(-15deg) rotateX(5deg) translateX(0);
-            transition: transform 0.3s ease-out;
-        }
-
-        .info-line:hover {
-            transform: rotateY(-10deg) rotateX(2deg) translateX(5px);
-        }
-        
-        #copyright-btn {
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 0.9em;
-            font-weight: 600;
-            margin-top: 20px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        #copyright-btn:hover {
-            background-color: #455a64;
-        }
-
-        /* Animation pour le panneau d'infos */
-        @keyframes fadeInSlideLeft {
-            from { opacity: 0; transform: translateX(30px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        
-        /* --- MODAL (Droits d'Auteur) --- */
-        #copyright-modal {
-            display: none; /* Caché par défaut */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.6);
-            padding-top: 60px;
-            backdrop-filter: blur(5px); 
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto; 
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             width: 90%;
-            max-width: 600px;
-            position: relative;
-            animation: fadeInModal 0.3s ease-out;
-            border-top: 8px solid var(--secondary-color);
+            max-width: 700px;
+            text-align: center;
         }
-        
-        @keyframes fadeInModal {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .modal-content h3 {
-            color: var(--secondary-color);
-            margin-top: 0;
-            font-size: 1.5em;
+        h1 {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
             padding-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .modal-content p {
-            font-size: 0.95em;
-            text-align: justify;
-        }
-        
-        .modal-content strong {
-            color: var(--primary-color);
-        }
-
-        .close-btn {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            transition: color 0.3s;
-        }
-
-        .close-btn:hover,
-        .close-btn:focus {
-            color: #777;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-
-        /* --- SECTIONS CATÉGORIES --- */
-        .category-section {
-            display: none; 
-            width: 100%;
-            animation: slideUp 0.4s ease-out;
-            padding-top: 20px;
-        }
-
-        .category-section.active {
-            display: block;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h2 {
-            color: var(--secondary-color);
-            font-size: 1.6em;
             margin-bottom: 20px;
-            border-left: 6px solid var(--primary-color);
-            padding-left: 15px;
         }
-
-        /* --- LISTE DES LIENS --- */
-        .link-list {
-            list-style: none;
-            padding: 0;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        .level-selector {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
             gap: 15px;
         }
-
-        .link-button {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            border: 1px solid #eceff1;
-            border-radius: 10px; 
-            background-color: #ffffff;
-            text-decoration: none;
-            color: var(--text-dark);
+        .level-selector label {
+            background-color: #e9ecef;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
             font-weight: 500;
-            transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         }
-
-        .link-button:hover {
-            background-color: #fff;
-            border-color: var(--primary-color);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.15);
-            transform: translateY(-2px);
-            color: var(--primary-color);
+        .level-selector input[type="radio"]:checked + label {
+            background-color: #007bff;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
         }
-
-        .link-button .icon {
-            margin-right: 12px;
-            font-size: 1.4em;
-            color: var(--primary-color);
+        .level-selector input[type="radio"] {
+            display: none;
         }
-
-        /* --- Responsive Design --- */
-        @media (max-width: 768px) {
-            #display-area {
-                flex-direction: column;
-                gap: 30px;
-            }
-            #info-panel {
-                text-align: center;
-                transform: translateX(0);
-                animation: fadeIn 0.8s ease-out forwards 0.5s;
-            }
-            .info-line {
-                transform: none;
-                text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-            }
-            .container {
-                padding: 20px;
-                min-height: auto;
-            }
-            .anim-container {
-                /* Sur mobile, on prend toute la largeur */
-                width: 100%;
-                max-width: 100%;
-                height: auto;
-            }
-            /* Masquer le pop-up sur les petits écrans pour éviter les problèmes de mise en page */
-            #category-popup {
-                display: none;
-            }
-            .modal-content {
-                margin: 10% auto;
-                width: 95%;
-            }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background-color: #218838;
+            transform: translateY(-1px);
+        }
+        #solve-btn {
+            background-color: #ffc107;
+            color: #333;
+        }
+        #solve-btn:hover {
+            background-color: #e0a800;
+        }
+        /* Nouveau style pour le bouton Droits d'Auteur */
+        #copyright-btn {
+            background-color: #6c757d; 
+            color: white;
+        }
+        #copyright-btn:hover {
+            background-color: #5a6268;
+        }
+        #problem-display {
+            font-size: 2em;
+            margin: 30px 0;
+            padding: 15px;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            min-height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #answer-display {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .answer-solution {
+            padding: 20px;
+            background-color: #e9f7ef;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            font-size: 1.1em;
+            margin-top: 15px;
+        }
+        .answer-solution h3 {
+            color: #155724;
+            margin-top: 0;
+            border-bottom: 1px solid #c3e6cb;
+            padding-bottom: 5px;
+        }
+        /* Style pour le contenu des droits d'auteur, utilisant la classe .answer-solution */
+        #copyright-content {
+            margin-top: 20px;
+            display: none; /* Caché par défaut */
+        }
+        #copyright-content h3 {
+            color: #6c757d;
+            border-bottom: 1px solid #ddd;
+        }
+        #copyright-content ul {
+            text-align: left;
         }
     </style>
 </head>
 <body>
-
     <div class="container">
-        
-        <div id="breadcrumb" class="breadcrumb">
-            </div>
-        
-        <div id="display-area">
-            
-            <div id="welcome-screen" class="anim-container">
-                <video autoplay loop muted playsinline>
-                    <source src="animation-maths.mp4" type="video/mp4">
-                    Votre navigateur ne supporte pas la balise vidéo.
-                </video>
-            </div>
+        <h1>Générateur de Calculs Algébriques</h1>
 
-            <div id="info-panel">
-                <div><span class="info-line">Auteur : Yann Merdy</span></div>
-                <div><span class="info-line">Année 2025 - 2026</span></div>
-                <div><span class="info-line">Première STL & STI2D</span></div>
-                <div><span class="info-line">TRONC COMMUN & PCM</span></div>
-                <button id="copyright-btn">⚖️ Droits d'Auteur</button>
-            </div>
-
-            <div id="categories-container" style="width: 100%;"></div>
-
+        <div class="level-selector">
+            <input type="radio" id="level1" name="level" value="1" checked>
+            <label for="level1">Niveau 1</label>
+            <input type="radio" id="level2" name="level" value="2">
+            <label for="level2">Niveau 2</label>
+            <input type="radio" id="level3" name="level" value="3">
+            <label for="level3">Niveau 3</label>
         </div>
-        
-    </div>
-    
-    <div id="category-popup"></div>
-    
-    <div id="copyright-modal" class="modal">
-      <div class="modal-content">
-        <span class="close-btn">&times;</span>
-        <h3>⚖️ Droits d'Auteur et Licence d'Utilisation</h3>
-        <p>Auteur : <strong>Yann Merdy (yann.merdy@gmail.com)</strong> - Novembre 2025</p>
-        <p><strong>Licence d'Utilisation Non Commerciale</strong></p>
-        <p>Ce code HTML/CSS/JavaScript ainsi que le contenu généré par l'application ("Cours et Exercices Dynamiques : Le Produit Scalaire") sont la propriété intellectuelle exclusive de l'auteur, Yann Merdy.</p>
-        
-        <p><strong>Conditions :</strong></p>
-        <ul>
-            <li><strong>Utilisation Privée et Éducative (Autorisée) :</strong> Vous êtes autorisé.e à utiliser, copier, modifier et distribuer ce code et son contenu **uniquement** à des fins **personnelles, éducatives et non lucratives.**</li>
-            <li><strong>Utilisation Commerciale (Interdite) :</strong> Toute utilisation, distribution, intégration ou reproduction du code ou du contenu (total ou partiel) à des fins **commerciales, lucratives ou professionnelles** est **strictement interdite** sans un accord écrit préalable et explicite de l'auteur.</li>
-            <li><strong>Attribution :</strong> Toute reproduction ou modification doit conserver la mention de l'auteur originale (Yann Merdy) et la présente notice de droits d'auteur.</li>
-        </ul>
-        <p>Pour toute demande d'utilisation commerciale ou de licence spécifique, veuillez contacter l'auteur à l'adresse indiquée ci-dessus.</p>
-      </div>
-    </div>
 
+        <div class="controls">
+            <button id="generate-btn">Nouveau Calcul</button>
+            <button id="solve-btn">Afficher/Masquer Solution</button>
+            <button id="copyright-btn">⚖️ Droits d'auteur</button>
+        </div>
+
+        <div id="problem-display">Cliquez sur "Nouveau Calcul"</div>
+
+        <div id="answer-display">
+            </div>
+        
+        <div id="copyright-content" class="answer-solution">
+            <h3>⚖️ Droits d'Auteur et Licence d'Utilisation</h3>
+            <p><strong>Auteur :</strong> Yann Merdy (yann.merdy@gmail.com) - Novembre 2025</p>
+            <p><strong>Licence d'Utilisation Non Commerciale</strong></p>
+            <p>Ce code HTML/CSS/JavaScript ainsi que le contenu généré par l'application ("Cours et Exercices Dynamiques : Le Produit Scalaire") sont la propriété intellectuelle exclusive de l'auteur, Yann Merdy.</p>
+            
+            <h4>Conditions :</h4>
+            <ul>
+                <li><strong>Utilisation Privée et Éducative (Autorisée) :</strong> Vous êtes autorisé.e à utiliser, copier, modifier et distribuer ce code et son contenu **uniquement** à des fins **personnelles, éducatives et non lucratives.**</li>
+                <li><strong>Utilisation Commerciale (Interdite) :</strong> Toute utilisation, distribution, intégration ou reproduction du code ou du contenu (total ou partiel) à des fins **commerciales, lucratives ou professionnelles** est **strictement interdite** sans un accord écrit préalable et explicite de l'auteur.</li>
+                <li><strong>Attribution :** Toute reproduction ou modification doit conserver la mention de l'auteur originale (Yann Merdy) et la présente notice de droits d'auteur.</li>
+            </ul>
+            <p>Pour toute demande d'utilisation commerciale ou de licence spécifique, veuillez contacter l'auteur à l'adresse indiquée ci-dessus.</p>
+        </div>
+    </div>
 
     <script>
-        // --- DONNÉES ---
-        const linksData = [
-            // Nouveaux liens ajoutés
-            { url: "https://ldv78100ym-hub.github.io/ALGEBRE_DIVERS/CALCULS.html", title: "Calculs (Algèbre Divers)", category: "Algèbre" },
-            { url: "https://ldv78100ym-hub.github.io/ALGEBRE_DIVERS/EVOLUTIONS.html", title: "Évolutions (Algèbre Divers)", category: "Algèbre" },
-            { url: "https://ldv78100ym-hub.github.io/ALGEBRE_DIVERS/IDENTITES_REMARQUABLES.html", title: "Identités Remarquables (Algèbre Divers)", category: "Algèbre" },
-            // Liens existants
-            { url: "https://ldv78100ym-hub.github.io/TABLEAUX-DE-SIGNES/", title: "Tableaux de Signes", category: "Algèbre" },
-            { url: "https://ldv78100ym-hub.github.io/FACTORISATIONS/", title: "Factorisations", category: "Algèbre" },
-            { url: "https://ldv78100ym-hub.github.io/SECOND_DEGRE/index1.html", title: "Second Degré (Général)", category: "Algèbre" },
-            { url: "https://ldv78100ym-hub.github.io/SECOND_DEGRE/index2.html", title: "Second Degré (Variante)", category: "Algèbre" },
-            { url: "https://ldv78100ym-hub.github.io/DROITES", title: "Droites (Géométrie Analytique)", category: "Analyse" },
-            { url: "https://ldv78100ym-hub.github.io/NOMBRE_DERIVE/", title: "Nombre Dérivé", category: "Analyse" },
-            { url: "https://ldv78100ym-hub.github.io/NOMBRE_DERIVE/CALCULS.html", title: "Calculs de Nombre Dérivé", category: "Analyse" },
-            { url: "https://ldv78100ym-hub.github.io/PRODUIT_SCALAIRE/", title: "Produit Scalaire", category: "Géométrie" },
-            { url: "https://ldv78100ym-hub.github.io/PROBABILITES/", title: "Probabilités", category: "Probabilités" },
-            { url: "https://ldv78100ym-hub.github.io/SECOND_DEGRE/index_jeux.html", title: "Jeux Mathématiques (Second Degré)", category: "JEUX" },
-            { url: "https://ldv78100ym-hub.github.io/JEUX-MATH-MATIQUES-/PRODUIT_SCALAIRE_JEUX.html", title: "Produit Scalaire (Quête)", category: "JEUX" } 
-        ];
+        // --- LOGIQUE DE CALCUL ---
+
+        // Fonction pour générer un entier aléatoire
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Fonction principale pour générer un problème et sa solution
+        function generateProblem(level) {
+            let terms = [];
+            let result = "";
+            let solutionSteps = [];
+            let numTerms;
+            let maxCoef;
+            let maxPower;
+
+            switch (level) {
+                case 1:
+                    numTerms = 2;
+                    maxCoef = 5;
+                    maxPower = 1;
+                    break;
+                case 2:
+                    numTerms = 3;
+                    maxCoef = 8;
+                    maxPower = 2;
+                    break;
+                case 3:
+                    numTerms = 4;
+                    maxCoef = 12;
+                    maxPower = 3;
+                    break;
+                default:
+                    numTerms = 2;
+                    maxCoef = 5;
+                    maxPower = 1;
+            }
+
+            // Générer les termes
+            for (let i = 0; i < numTerms; i++) {
+                let coef = getRandomInt(-maxCoef, maxCoef);
+                // On s'assure d'avoir au moins un terme non nul
+                if (i === 0 && coef === 0 && numTerms > 1) {
+                    coef = getRandomInt(1, maxCoef); 
+                }
+                const power = getRandomInt(0, maxPower);
+                
+                // Ignorer les termes de la forme 0x^n
+                if (coef !== 0) {
+                    terms.push({ coef, power });
+                }
+            }
+
+            // Regrouper les termes (calcul algébrique)
+            let groupedTerms = {};
+            terms.forEach(term => {
+                if (groupedTerms[term.power]) {
+                    groupedTerms[term.power] += term.coef;
+                } else {
+                    groupedTerms[term.power] = term.coef;
+                }
+            });
+
+            // Construction de la chaîne LaTeX du problème
+            let problemLatex = "";
+            terms.sort((a, b) => b.power - a.power); // Tri par puissance pour l'affichage
+            
+            terms.forEach((term, index) => {
+                const { coef, power } = term;
+                if (coef === 0) return;
+                
+                let sign = (coef > 0 && index !== 0) ? '+' : '';
+                let absCoef = Math.abs(coef);
+                let coefStr = (absCoef === 1 && power !== 0) ? '' : absCoef;
+                
+                if (coef < 0) sign = '-';
+                
+                let powerStr;
+                if (power === 0) {
+                    powerStr = `${absCoef}`;
+                    coefStr = ''; 
+                } else if (power === 1) {
+                    powerStr = 'x';
+                } else {
+                    powerStr = `x^{${power}}`;
+                }
+                
+                problemLatex += `${sign}${coefStr}${powerStr}`;
+            });
+            
+            // Nettoyage de la chaîne: supprimer le '+' initial
+            if (problemLatex.startsWith('+')) {
+                problemLatex = problemLatex.substring(1);
+            }
+            
+            // Construction de la chaîne LaTeX de la solution
+            let solutionLatex = "";
+            let finalTerms = [];
+            
+            Object.keys(groupedTerms).sort((a, b) => b - a).forEach(powerStr => {
+                const power = parseInt(powerStr);
+                const coef = groupedTerms[power];
+                
+                if (coef !== 0) {
+                    finalTerms.push({ coef, power });
+                }
+            });
+
+            finalTerms.forEach((term, index) => {
+                const { coef, power } = term;
+                
+                let sign = (coef > 0 && index !== 0) ? '+' : '';
+                let absCoef = Math.abs(coef);
+                let coefStr = (absCoef === 1 && power !== 0) ? '' : absCoef;
+                
+                if (coef < 0) sign = '-';
+                
+                let powerStr;
+                if (power === 0) {
+                    powerStr = `${absCoef}`;
+                    coefStr = ''; 
+                } else if (power === 1) {
+                    powerStr = 'x';
+                } else {
+                    powerStr = `x^{${power}}`;
+                }
+                
+                solutionLatex += `${sign}${coefStr}${powerStr}`;
+            });
+
+            if (solutionLatex === "") {
+                solutionLatex = "0";
+            }
+            // Nettoyage de la chaîne: supprimer le '+' initial
+            if (solutionLatex.startsWith('+')) {
+                solutionLatex = solutionLatex.substring(1);
+            }
+            
+            // Construction des étapes de la solution
+            // Étape 1: Regrouper les termes similaires
+            solutionSteps.push("On regroupe les termes selon leurs puissances de \\( x \\) :");
+            
+            Object.keys(groupedTerms).sort((a, b) => b - a).forEach(powerStr => {
+                const power = parseInt(powerStr);
+                
+                let step = `\\( x^{${power}} \\) : `;
+                let sum = 0;
+                let contributingTerms = [];
+                
+                terms.forEach(term => {
+                    if (term.power === power) {
+                        contributingTerms.push((term.coef > 0 && contributingTerms.length > 0 ? "+" : "") + term.coef);
+                        sum += term.coef;
+                    }
+                });
+                
+                if (contributingTerms.length > 0) {
+                     // Utiliser power=0 pour le terme constant
+                    const powerDisplay = power === 0 ? "(terme constant)" : `\\( x^{${power}} \\)`;
+                    const termText = contributingTerms.join('');
+                    
+                    // Assurer que le premier terme n'a pas de '+' si positif
+                    let finalSumText = (sum > 0 && sum !== 0 && termText.startsWith('+')) ? termText.substring(1) : termText;
+                    
+                    solutionSteps.push(`\\( ${powerDisplay} \\): \\( ${finalSumText} = ${sum} \\)`);
+                }
+            });
+            
+            // Étape 2: Résultat final
+            solutionSteps.push("On assemble les termes simplifiés pour obtenir le résultat final :");
+            solutionSteps.push(`$$ ${problemLatex} = ${solutionLatex} $$`);
+            
+
+            return { problem: `$$ ${problemLatex} $$`, solution: solutionLatex, steps: solutionSteps };
+        }
         
-        // Regrouper les liens une seule fois au chargement pour le pop-up
-        const groupedLinks = linksData.reduce((acc, link) => {
-            if (!acc[link.category]) acc[link.category] = [];
-            acc[link.category].push(link);
-            return acc;
-        }, {});
+        // --- LOGIQUE D'AFFICHAGE ---
 
+        let currentProblem = null;
 
-        // --- UTILITAIRES DE PAGE ---
-        function sanitizeId(text) {
-            return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        }
-
-        function getCategoryIcon(category) {
-            if (category === "Algèbre") return '➗';
-            if (category === "Géométrie") return '📐';
-            if (category === "Probabilités") return '🎲';
-            if (category === "JEUX") return '🎮'; // Icône pour les jeux
-            return '📈';
-        }
-
-        // --- GESTION POP-UP ---
-        const popup = document.getElementById('category-popup');
-
-        function showPopup(categoryName, event) {
-            if (window.innerWidth <= 768) return; 
-
-            const links = groupedLinks[categoryName] || [];
-            if (links.length === 0) return;
-
-            let contentHTML = `<h3>${categoryName}</h3><ul>`;
-            links.forEach(link => {
-                contentHTML += `<li><a href="${link.url}" target="_blank">${link.title}</a></li>`;
-            });
-            contentHTML += `</ul>`;
+        function updateDisplay() {
+            // 1. Déterminer le niveau
+            const level = parseInt(document.querySelector('input[name="level"]:checked').value);
             
-            popup.innerHTML = contentHTML;
-
-            const buttonRect = event.currentTarget.getBoundingClientRect();
-            const containerRect = document.querySelector('.container').getBoundingClientRect();
+            // 2. Générer le nouveau problème
+            currentProblem = generateProblem(level);
             
-            const topPosition = buttonRect.bottom + window.scrollY - containerRect.top + 10;
-            const leftPosition = buttonRect.left + window.scrollX - containerRect.left;
+            // 3. Afficher le problème
+            const problemDisplay = document.getElementById('problem-display');
+            problemDisplay.innerHTML = currentProblem.problem;
             
-            popup.style.top = `${topPosition}px`;
-            popup.style.left = `${leftPosition}px`;
+            // 4. Préparer et afficher la solution (initialement masquée)
+            const answerContainer = document.getElementById('answer-display');
+            answerContainer.innerHTML = ''; 
             
-            const popUpWidth = popup.offsetWidth;
-            const containerWidth = containerRect.width;
-
-            if (leftPosition + popUpWidth > containerWidth) {
-                popup.style.left = `${containerWidth - popUpWidth - 40}px`; 
-            }
+            const solutionHtml = `
+                <h3>Solution détaillée :</h3>
+                ${currentProblem.steps.map(step => `<p>${step}</p>`).join('')}
+            `;
             
-            popup.classList.add('visible');
-        }
-
-        function hidePopup() {
-            popup.classList.remove('visible');
-        }
-
-        // --- NAVIGATION ---
-        function switchCategory(targetId) {
-            // Masquer l'écran d'accueil
-            const welcomeScreen = document.getElementById('welcome-screen');
-            const infoPanel = document.getElementById('info-panel');
+            const newSolutionDiv = document.createElement('div');
+            newSolutionDiv.className = 'answer-solution';
+            newSolutionDiv.innerHTML = solutionHtml;
+            answerContainer.appendChild(newSolutionDiv);
             
-            // Masquer la vidéo et le panneau d'infos
-            if (welcomeScreen.style.display !== 'none') {
-                welcomeScreen.style.display = 'none';
-                infoPanel.style.display = 'none';
-            }
+            // 5. Masquer la solution et les droits d'auteur
+            answerContainer.style.display = 'none';
+            document.getElementById('copyright-content').style.display = 'none';
 
-            // Masquer toutes les sections
-            document.querySelectorAll('.category-section').forEach(el => el.classList.remove('active'));
-            
-            // Désactiver tous les boutons
-            document.querySelectorAll('.breadcrumb-btn').forEach(el => el.classList.remove('active'));
-
-            // Activer la section cible
-            const targetSection = document.getElementById('section-' + targetId);
-            if (targetSection) targetSection.classList.add('active');
-
-            // Activer le bouton cible
-            const targetBtn = document.getElementById('btn-' + targetId);
-            if (targetBtn) targetBtn.classList.add('active');
-        }
-
-        // --- GESTION MODALE DROITS D'AUTEUR ---
-        const modal = document.getElementById('copyright-modal');
-        const btn = document.getElementById("copyright-btn");
-        const span = document.getElementsByClassName("close-btn")[0];
-
-        // Quand l'utilisateur clique sur le bouton, ouvrir la modale 
-        btn.onclick = function() {
-          modal.style.display = "block";
-        }
-
-        // Quand l'utilisateur clique sur (x), fermer la modale
-        span.onclick = function() {
-          modal.style.display = "none";
-        }
-
-        // Quand l'utilisateur clique n'importe où en dehors de la modale, la fermer
-        window.onclick = function(event) {
-          if (event.target == modal) {
-            modal.style.display = "none";
-          }
-        }
-
-
-        // --- INITIALISATION ---
-        function initPage() {
-            const breadcrumbContainer = document.getElementById('breadcrumb');
-            const categoriesContainer = document.getElementById('categories-container');
-            
-            categoriesContainer.innerHTML = '';
-            
-            const categories = Object.keys(groupedLinks);
-            if (categories.length === 0) return;
-
-            categories.forEach(category => {
-                const safeId = sanitizeId(category);
-                const icon = getCategoryIcon(category);
-
-                // Bouton Menu
-                const btn = document.createElement('a');
-                btn.href = "#"; 
-                btn.className = 'breadcrumb-btn';
-                btn.id = 'btn-' + safeId;
-                btn.innerHTML = `<span class="icon-breadcrumb">${icon}</span> ${category}`;
-                
-                btn.addEventListener('mouseenter', (e) => showPopup(category, e));
-                btn.addEventListener('mouseleave', hidePopup);
-                
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    switchCategory(safeId);
+            // 6. Forcer le rendu MathJax sur les deux éléments (Problème et Solution)
+            if (window.MathJax) {
+                // On rend le problème immédiatement, la solution sera rendue si elle est affichée
+                MathJax.typesetPromise([problemDisplay]).then(() => {
+                    // S'assurer que le contenu de la solution est prêt à être affiché
+                    MathJax.typesetPromise([newSolutionDiv]);
                 });
-
-                breadcrumbContainer.appendChild(btn);
-
-                // Section Contenu
-                const section = document.createElement('div');
-                section.className = 'category-section';
-                section.id = 'section-' + safeId;
-
-                const title = document.createElement('h2');
-                title.textContent = category;
-                section.appendChild(title);
-
-                const ul = document.createElement('ul');
-                ul.className = 'link-list';
-
-                groupedLinks[category].forEach(link => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <a href="${link.url}" class="link-button" target="_blank">
-                            <span class="icon">${icon}</span>
-                            <span>${link.title}</span>
-                        </a>
-                    `;
-                    ul.appendChild(li);
-                });
-
-                section.appendChild(ul);
-                categoriesContainer.appendChild(section);
-            });
-            
-            // Suppression de l'appel à initAnimation() car remplacé par la vidéo
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', initPage);
+        // Fonction pour afficher/masquer le contenu des droits d'auteur
+        function toggleCopyright() {
+            const copyrightDiv = document.getElementById('copyright-content');
+            const isHidden = copyrightDiv.style.display === 'none' || copyrightDiv.style.display === '';
+            
+            // Basculer l'affichage de la section Droits d'Auteur
+            copyrightDiv.style.display = isHidden ? 'block' : 'none';
+            
+            // S'assurer que la solution est masquée quand on affiche les droits
+            document.getElementById('answer-display').style.display = 'none';
+            
+            // Forcer le rendu MathJax des droits d'auteur si on vient de les afficher (bien que peu probable)
+            if (isHidden && window.MathJax) {
+                 MathJax.typesetPromise([copyrightDiv]);
+            }
+        }
 
+
+        // --- INITIALISATION ET ÉVÉNEMENTS ---
+
+        document.getElementById('generate-btn').addEventListener('click', updateDisplay);
+        document.getElementById('copyright-btn').addEventListener('click', toggleCopyright);
+
+
+        // Déclencher un nouveau calcul si le niveau change
+        document.querySelectorAll('input[name="level"]').forEach(radio => {
+            radio.addEventListener('change', updateDisplay);
+        });
+
+        document.getElementById('solve-btn').addEventListener('click', function() {
+            const answerDisplay = document.getElementById('answer-display');
+            const isHidden = answerDisplay.style.display === 'none' || answerDisplay.style.display === '';
+            
+            // Basculer l'affichage de la solution
+            answerDisplay.style.display = isHidden ? 'block' : 'none';
+            
+            // S'assurer que les droits d'auteur sont masqués
+            document.getElementById('copyright-content').style.display = 'none';
+            
+             // Le rendu MathJax de la solution est géré dans updateDisplay
+        });
+
+        // Initialisation: S'assurer que MathJax est prêt et générer le premier problème.
+        window.onload = function() {
+            if (window.MathJax) {
+                // MathJax est déjà chargé via le script async. On attend juste que le DOM soit prêt.
+                updateDisplay();
+            } else {
+                updateDisplay();
+            }
+        };
     </script>
-
 </body>
 </html>
