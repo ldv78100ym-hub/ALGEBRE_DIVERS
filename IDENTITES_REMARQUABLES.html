@@ -4,6 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exercices sur les Identités Remarquables</title>
+    <script>
+        // Configuration MathJax pour les formules en LaTeX
+        window.MathJax = {
+            loader: { load: ['input/tex', 'output/chtml'] },
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                processEscapes: true,
+                packages: {'[+]': ['ams']}
+            },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    MathJax.startup.promise.then(() => {
+                        console.log('MathJax chargé');
+                    });
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -24,12 +45,17 @@
             color: #007bff;
             margin-bottom: 30px;
         }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
         button {
             background-color: #28a745;
             color: white;
             border: none;
             padding: 10px 20px;
-            margin-bottom: 20px;
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
@@ -38,348 +64,309 @@
         button:hover {
             background-color: #218838;
         }
-        .exercice {
-            border: 1px solid #ddd;
+        .section-header {
+            background-color: #007bff;
+            color: white;
             padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            text-align: left;
-            background-color: #e9ecef;
-        }
-        .math-expr {
+            margin-top: 20px;
+            border-radius: 5px 5px 0 0;
             font-size: 1.2em;
-            font-weight: bold;
-            margin: 10px 0;
         }
-        .type-header {
-            font-weight: bold;
-            color: #0056b3;
-            margin-top: 10px;
+        .exercice-section {
+            border: 1px solid #ddd;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            padding-bottom: 15px;
+            background-color: #f9f9f9;
         }
-        .hint-level {
-            margin-top: 8px !important;
-            padding: 8px;
-            background-color: #f8f9fa;
-            border-left: 4px solid #007bff;
-            border-radius: 3px;
-            font-size: 0.95em;
+        .problem {
+            font-size: 1.4em;
+            margin: 20px 0;
+            padding: 0 15px;
         }
         .solution {
-            padding: 10px;
-            border: 1px dashed #aaa;
-            background-color: #ffe8d6;
-            margin-top: 15px;
+            margin: 10px 15px;
+            padding: 15px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
             border-radius: 5px;
+            text-align: left;
+            font-size: 1.1em;
+            display: none; /* Caché par défaut */
+        }
+        .solution p {
+            margin: 5px 0;
+        }
+        .hint-container {
+            margin-top: 15px;
+        }
+        .hint {
+            margin: 5px 15px;
+            padding: 10px;
+            background-color: #ffeeba;
+            border: 1px solid #ffc107;
+            border-radius: 5px;
+            text-align: left;
+            font-style: italic;
+            font-size: 0.95em;
+            display: none;
+        }
+        .action-buttons {
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .action-buttons button {
+            padding: 8px 15px;
+            font-size: 0.9em;
         }
         .hint-button {
             background-color: #ffc107;
             color: #333;
-            padding: 6px 12px;
-            font-size: 0.9em;
-            margin-top: 10px;
-            border-radius: 4px;
         }
         .hint-button:hover {
             background-color: #e0a800;
         }
+        .solution-button {
+            background-color: #dc3545;
+        }
+        .solution-button:hover {
+            background-color: #c82333;
+        }
+        /* Style spécifique pour le bouton droits d'auteur */
+        #copyright-btn {
+            background-color: #6c757d; /* Gris */
+        }
+        #copyright-btn:hover {
+            background-color: #5a6268;
+        }
+        /* Style pour le contenu des droits d'auteur, utilisant la classe .solution pour l'apparence */
+        #copyright-content {
+            margin-bottom: 30px;
+        }
+        #copyright-content h3 {
+            color: #6c757d;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
     </style>
-    
-    
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
 </head>
 <body>
 
     <div class="container">
         <h1>Générateur d'Exercices : Identités Remarquables</h1>
-        <p>Coefficients aléatoires compris entre <span style="font-weight: bold; color: red;">2 et 20</span>. Un seul exercice à la fois avec aides graduées.</p>
-        <button onclick="generateExercises()">Générer un Nouvel Exercice</button>
-        <div id="exercices-output">
+
+        <div class="controls">
+            <button onclick="generateExercises()">Nouveaux Exercices</button>
+            <button onclick="toggleAllSolutions(this)" class="solution-button">Afficher/Masquer Toutes les Solutions</button>
+            <button id="copyright-btn">⚖️ Droits d'auteur</button>
+        </div>
+        
+        <div id="copyright-content" class="solution">
+            <h3>⚖️ Droits d'Auteur et Licence d'Utilisation</h3>
+            <p><strong>Auteur :</strong> Yann Merdy (yann.merdy@gmail.com) - Novembre 2025</p>
+            <p><strong>Licence d'Utilisation Non Commerciale</strong></p>
+            <p>Ce code HTML/CSS/JavaScript ainsi que le contenu généré par l'application ("Cours et Exercices Dynamiques : Le Produit Scalaire") sont la propriété intellectuelle exclusive de l'auteur, Yann Merdy.</p>
+            
+            <h4>Conditions :</h4>
+            <ul>
+                <li><strong>Utilisation Privée et Éducative (Autorisée) :</strong> Vous êtes autorisé.e à utiliser, copier, modifier et distribuer ce code et son contenu **uniquement** à des fins **personnelles, éducatives et non lucratives.**</li>
+                <li><strong>Utilisation Commerciale (Interdite) :</strong> Toute utilisation, distribution, intégration ou reproduction du code ou du contenu (total ou partiel) à des fins **commerciales, lucratives ou professionnelles** est **strictement interdite** sans un accord écrit préalable et explicite de l'auteur.</li>
+                <li><strong>Attribution :</strong> Toute reproduction ou modification doit conserver la mention de l'auteur originale (Yann Merdy) et la présente notice de droits d'auteur.</li>
+            </ul>
+            <p>Pour toute demande d'utilisation commerciale ou de licence spécifique, veuillez contacter l'auteur à l'adresse indiquée ci-dessus.</p>
+        </div>
+        
+        <div id="exercices-container">
             </div>
     </div>
 
     <script>
-        // Fonction utilitaire pour obtenir un entier aléatoire entre min et max (inclus)
+        // Variables pour les identités remarquables
+        const identites = [
+            { id: 1, type: "Développement", forme: "(a+b)²", developpe: "a² + 2ab + b²", fn: (a, b) => `\\( (${a}x + ${b})^2 \\)`, sol: (a, b) => `\\( ${a*a}x^2 + ${2*a*b}x + ${b*b} \\)` },
+            { id: 2, type: "Développement", forme: "(a-b)²", developpe: "a² - 2ab + b²", fn: (a, b) => `\\( (${a}x - ${b})^2 \\)`, sol: (a, b) => `\\( ${a*a}x^2 - ${2*a*b}x + ${b*b} \\)` },
+            { id: 3, type: "Développement", forme: "(a-b)(a+b)", developpe: "a² - b²", fn: (a, b) => `\\( (${a}x - ${b})(${a}x + ${b}) \\)`, sol: (a, b) => `\\( ${a*a}x^2 - ${b*b} \\)` },
+            { id: 4, type: "Factorisation", forme: "a² + 2ab + b²", factorise: "(a+b)²", fn: (a, b) => `\\( ${a*a}x^2 + ${2*a*b}x + ${b*b} \\)`, sol: (a, b) => `\\( (${a}x + ${b})^2 \\)` },
+            { id: 5, type: "Factorisation", forme: "a² - 2ab + b²", factorise: "(a-b)²", fn: (a, b) => `\\( ${a*a}x^2 - ${2*a*b}x + ${b*b} \\)`, sol: (a, b) => `\\( (${a}x - ${b})^2 \\)` },
+            { id: 6, type: "Factorisation", forme: "a² - b²", factorise: "(a-b)(a+b)", fn: (a, b) => `\\( ${a*a}x^2 - ${b*b} \\)`, sol: (a, b) => `\\( (${a}x - ${b})(${a}x + ${b}) \\)` }
+        ];
+
+        // Fonction pour générer un nombre aléatoire entre min et max (inclus)
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        // Renvoie l'expression LaTeX pour un terme ax^n, gérant a=1 ou a=0
-        function getLatexTerm(a, x, n = 1) {
-            const abs_a = Math.abs(a);
-            
-            // Partie du coefficient
-            let coeff_part;
-            if (n === 0) {
-                coeff_part = abs_a;
-            } else if (abs_a === 1) {
-                coeff_part = '';
-            } else {
-                coeff_part = abs_a;
-            }
-            
-            // Partie de la variable
-            let var_part;
-            if (n === 0) {
-                var_part = '';
-            } else if (n === 1) {
-                var_part = x;
-            } else { // n >= 2
-                var_part = x + '^{' + n + '}';
-            }
-            
-            return coeff_part + var_part;
-        }
-
-        // Renvoie les aides graduées en fonction de l'opération et du type d'identité
-        function getGraduatedHints(a, b, type, operation) {
-            let hints = [];
-            const A_term = getLatexTerm(a, 'x');
-            const A2_term = getLatexTerm(a * a, 'x', 2);
-            const B_term = b;
-            const B2_term = b * b;
-            
-            // Utilisation de double antislash (\\) pour l'échappement en JS/LaTeX
-            const A_sqrt_latex = `\\sqrt{${A2_term}}`; 
-            const B_sqrt_latex = `\\sqrt{${B2_term}}`; 
-
-            if (operation === 'Expansion') {
-                // Hints pour le Développement
-                switch (type) {
-                    case 1: // (A+B)²
-                        hints.push("Identifiez la forme : c'est un développement de la forme $$(A+B)^2$$");
-                        hints.push("Formule à appliquer : $$(A+B)^2 = A^2 + 2AB + B^2$$");
-                        // Correction: Mise de toute l'application entre $$ pour le rendu
-                        const expApp1 = `Application : Identifiez $$A = ${A_term}$$ et $$B = ${B_term}$$ Le développement est $$\\left( ${A_term} \\right)^2 + 2\\left(${A_term}\\right)\\left(${B_term}\\right) + \\left(${B_term}\\right)^2$$`;
-                        hints.push(expApp1);
-                        break;
-                    case 2: // (A-B)²
-                        hints.push("Identifiez la forme : c'est un développement de la forme $$(A-B)^2$$");
-                        hints.push("Formule à appliquer : $$(A-B)^2 = A^2 - 2AB + B^2$$");
-                        const expApp2 = `Application : Identifiez $$A = ${A_term}$$ et $$B = ${B_term}$$ Le développement est $$\\left( ${A_term} \\right)^2 - 2\\left(${A_term}\\right)\\left(${B_term}\\right) + \\left(${B_term}\\right)^2$$`;
-                        hints.push(expApp2);
-                        break;
-                    case 3: // (A+B)(A-B)
-                        hints.push("Identifiez la forme : c'est un développement de la forme $$(A+B)(A-B)$$");
-                        hints.push("Formule à appliquer : $$(A+B)(A-B) = A^2 - B^2$$");
-                        const expApp3 = `Application : Identifiez $$A = ${A_term}$$ et $$B = ${B_term}$$ Le développement est $$\\left( ${A_term} \\right)^2 - \\left(${B_term}\\right)^2$$`;
-                        hints.push(expApp3);
-                        break;
-                }
-            } else { 
-                // Hints pour la Factorisation
-                switch (type) {
-                    case 1: // A² + 2AB + B²
-                        hints.push("Identifiez la forme : c'est une factorisation de la forme $$A^2 + 2AB + B^2$$");
-                        hints.push("Formule à appliquer : $$A^2 + 2AB + B^2 = (A+B)^2$$");
-                        // Correction: Les termes $A$ et $B$ sont encadrés par $$ pour une interprétation correcte
-                        const factApp1 = `Application : Trouvez \\(A\\) et \\(B\\) : $$A = ${A_sqrt_latex} = ${A_term}$$ et $$B = ${B_sqrt_latex} = ${B_term}$$`;
-                        hints.push(factApp1);
-                        break;
-                    case 2: // A² - 2AB + B²
-                        hints.push("Identifiez la forme : c'est une factorisation de la forme $$A^2 - 2AB + B^2$$");
-                        hints.push("Formule à appliquer : $$A^2 - 2AB + B^2 = (A-B)^2$$");
-                        const factApp2 = `Application : Trouvez \\(A\\) et \\(B\\) : $$A = ${A_sqrt_latex} = ${A_term}$$ et $$B = ${B_sqrt_latex} = ${B_term}$$`;
-                        hints.push(factApp2);
-                        break;
-                    case 3: // A² - B²
-                        hints.push("Identifiez la forme : c'est une factorisation de la forme $$A^2 - B^2$$");
-                        hints.push("Formule à appliquer : $$A^2 - B^2 = (A-B)(A+B)$$");
-                        const factApp3 = `Application : Trouvez \\(A\\) et \\(B\\) : $$A = ${A_sqrt_latex} = ${A_term}$$ et $$B = ${B_sqrt_latex} = ${B_term}$$`;
-                        hints.push(factApp3);
-                        break;
-                }
-            }
-            return hints;
-        }
-
-        // Génère un exercice de développement
-        function generateExpansionExercise(a, b, type) {
-            const A_term = getLatexTerm(a, 'x');
-            const B_term = b;
-            const A2_term = getLatexTerm(a * a, 'x', 2);
-            const B2_term = b * b;
-            const twoAB_term = getLatexTerm(2 * a * b, 'x');
-            let latex_question = '';
-            let latex_answer = '';
-
-            switch (type) {
-                case 1: 
-                    latex_question = `(${A_term} + ${B_term})^2`;
-                    latex_answer = `${A2_term} + ${twoAB_term} + ${B2_term}`;
-                    break;
-                case 2: 
-                    latex_question = `(${A_term} - ${B_term})^2`;
-                    latex_answer = `${A2_term} - ${twoAB_term} + ${B2_term}`;
-                    break;
-                case 3: 
-                    latex_question = `(${A_term} + ${B_term})(${A_term} - ${B_term})`;
-                    latex_answer = `${A2_term} - ${B2_term}`;
-                    break;
-            }
-
-            return {
-                type: 'Développement',
-                question: `$$${latex_question}$$`,
-                answer: `$$${latex_answer}$$`,
-                hint: `Identité n°${type}`
-            };
-        }
-
-        // Génère un exercice de factorisation
-        function generateFactorizationExercise(a, b, type) {
-            const A_term = getLatexTerm(a, 'x');
-            const B_term = b;
-            const A2_term = getLatexTerm(a * a, 'x', 2);
-            const B2_term = b * b;
-            const twoAB_term = getLatexTerm(2 * a * b, 'x');
-            let latex_question = '';
-            let latex_answer = '';
-            
-            switch (type) {
-                case 1: 
-                    latex_question = `${A2_term} + ${twoAB_term} + ${B2_term}`;
-                    latex_answer = `(${A_term} + ${B_term})^2`;
-                    break;
-                case 2: 
-                    latex_question = `${A2_term} - ${twoAB_term} + ${B2_term}`;
-                    latex_answer = `(${A_term} - ${B_term})^2`;
-                    break;
-                case 3: 
-                    latex_question = `${A2_term} - ${B2_term}`;
-                    latex_answer = `(${A_term} + ${B_term})(${A_term} - ${B_term})`;
-                    break;
-            }
-
-            return {
-                type: 'Factorisation',
-                question: `$$${latex_question}$$`,
-                answer: `$$${latex_answer}$$`,
-                hint: `Identité n°${type}`
-            };
-        }
-
-        // Fonction principale pour générer un exercice
+        // Génère les exercices pour les 3 types
         function generateExercises() {
-            const outputDiv = document.getElementById('exercices-output');
-            outputDiv.innerHTML = ''; 
-
-            // Coefficients et type d'identité
-            // MODIFICATION ICI : Coefficients entre 2 et 20 inclus
-            const a = getRandomInt(2, 20); 
-            const b = getRandomInt(2, 20);
-            const type = getRandomInt(1, 3); 
-
-            const expansionEx = generateExpansionExercise(a, b, type);
-            const factorizationEx = generateFactorizationExercise(a, b, type);
-
-            // Obtenir les aides
-            const expHints = getGraduatedHints(a, b, type, 'Expansion');
-            const factHints = getGraduatedHints(a, b, type, 'Factorization');
+            const container = document.getElementById('exercices-container');
+            container.innerHTML = '';
             
-            // Fonction pour générer l'HTML des aides
-            const renderHints = (hints, sectionId) => {
-                let hintHtml = '';
-                hints.forEach((hint, index) => {
-                    // Chaque aide est cachée au départ
-                    hintHtml += `<div id="${sectionId}_hint_${index + 1}" class="hint-level" style="display:none;">
-                                        <strong>Aide ${index + 1}</strong> : ${hint}
-                                       </div>`;
-                });
-                return hintHtml;
-            };
+            // Masquer les droits d'auteur si affichés
+            document.getElementById('copyright-content').style.display = 'none';
 
-            const exerciseHTML = `
-                <div class="exercice" id="current-exercise">
-                    <h2>Exercice Unique</h2>
-                    <p>Développez et Factorisez en utilisant l'**Identité n°${type}**.</p>
-                    
-                    <hr>
-                    <div id="section-expansion">
-                        <div class="type-header">A. Développement : ${expansionEx.hint}</div>
-                        <div class="math-expr">${expansionEx.question}</div>
-                        
-                        <button class="hint-button" onclick="showNextHint('expansion', ${expHints.length})">Afficher l'Aide Suivante (Développement)</button>
-                        <div class="hints-container" data-current-hint="0" data-section="expansion">
-                            ${renderHints(expHints, 'expansion')}
-                        </div>
-                        
-                        <div class="solution expansion-solution" style="display:none;">
-                            <strong>Solution Développement</strong> : ${expansionEx.answer}
-                        </div>
-                    </div>
-                    
-                    <hr>
-                    <div id="section-factorization">
-                        <div class="type-header">B. Factorisation : ${factorizationEx.hint}</div>
-                        <div class="math-expr">${factorizationEx.question}</div>
-                        
-                        <button class="hint-button" onclick="showNextHint('factorization', ${factHints.length})">Afficher l'Aide Suivante (Factorisation)</button>
-                        <div class="hints-container" data-current-hint="0" data-section="factorization">
-                            ${renderHints(factHints, 'factorization')}
-                        </div>
-                        
-                        <div class="solution factorization-solution" style="display:none;">
-                            <strong>Solution Factorisation</strong> : ${factorizationEx.answer}
-                        </div>
-                    </div>
-                    <hr>
-                    
-                    <button onclick="toggleAllSolutions(this)">Afficher/Masquer Toutes les Solutions</button>
+            // Les identités à développer
+            generateSection(container, "Développement", [1, 2, 3], 2); // 2 exos de développement
+            
+            // Les identités à factoriser
+            generateSection(container, "Factorisation", [4, 5, 6], 2); // 2 exos de factorisation
+        }
+
+        // Génère une section d'exercices
+        function generateSection(parentContainer, sectionName, ids, count) {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'exercice-section';
+            sectionDiv.id = `section-${sectionName}`;
+            
+            sectionDiv.innerHTML = `<div class="section-header">${sectionName}</div>`;
+            
+            for (let i = 0; i < count; i++) {
+                const randomId = ids[getRandomInt(0, ids.length - 1)];
+                const ir = identites.find(item => item.id === randomId);
+                
+                // Générer des nombres aléatoires pour a et b
+                const a = getRandomInt(2, 5);
+                const b = getRandomInt(1, 6); 
+                
+                const problemLatex = ir.fn(a, b);
+                const solutionLatex = ir.sol(a, b);
+                
+                // Pistes d'aide pour l'utilisateur
+                const hints = [
+                    `Ceci est une identité remarquable de type : **${ir.forme}**`,
+                    `Rappelez-vous la formule : **${ir.developpe || ir.factorise}**`,
+                    `Identifiez **a** et **b** : dans ce cas, \\( a = ${a}x \\) et \\( b = ${b} \\).`
+                ];
+
+                const exerciceHtml = createExerciceHtml(sectionName, i, problemLatex, solutionLatex, hints);
+                sectionDiv.innerHTML += exerciceHtml;
+            }
+
+            parentContainer.appendChild(sectionDiv);
+             
+             // Relancer MathJax sur la section pour le rendu initial
+             if (typeof MathJax !== 'undefined') {
+                 MathJax.typesetPromise([sectionDiv]);
+             }
+        }
+        
+        // Crée la structure HTML d'un exercice
+        function createExerciceHtml(sectionName, index, problemLatex, solutionLatex, hints) {
+            const num = index + 1;
+            const uniqueId = `${sectionName.toLowerCase()}-${num}`;
+            
+            let hintsHtml = '<div class="hint-container">';
+            hints.forEach((hint, idx) => {
+                hintsHtml += `<div id="${uniqueId}-hint-${idx}" class="hint">${hint}</div>`;
+            });
+            hintsHtml += '</div>';
+            
+            return `
+                <div class="problem">
+                    **Exercice ${num}** : ${problemLatex}
+                </div>
+                <div class="action-buttons">
+                    <button class="hint-button" onclick="showNextHint('${sectionName}', ${index}, ${hints.length})">Piste (${hints.length} max)</button>
+                    <button class="solution-button" onclick="toggleSolution('${uniqueId}-solution')">Solution</button>
+                </div>
+                ${hintsHtml}
+                <div id="${uniqueId}-solution" class="solution">
+                    **Solution :** ${solutionLatex}
                 </div>
             `;
-            outputDiv.innerHTML = exerciseHTML;
-
-            // *** APPEL À MATHJAX POUR RENDRE LES EXPRESSIONS INITIALES ***
-             if (typeof MathJax !== 'undefined') {
-                 MathJax.typesetPromise([outputDiv]); 
-             } 
         }
 
-        // Affiche la prochaine aide disponible (fonction pour l'aide graduée)
-        function showNextHint(sectionName, totalHints) {
-            const hintsContainer = document.querySelector(`.hints-container[data-section="${sectionName}"]`);
-            const currentHintIndex = parseInt(hintsContainer.dataset.currentHint);
-            
-            if (currentHintIndex < totalHints) {
-                const nextHintId = `${sectionName}_hint_${currentHintIndex + 1}`;
-                const nextHintElement = document.getElementById(nextHintId);
-                
-                if (nextHintElement) {
-                    nextHintElement.style.display = 'block';
-                    hintsContainer.dataset.currentHint = currentHintIndex + 1;
+        // Affiche la piste suivante pour un exercice
+        function showNextHint(sectionName, index, totalHints) {
+            const section = document.getElementById(`section-${sectionName}`);
+            const solutionDiv = section.querySelector(`#${sectionName.toLowerCase()}-${index+1}-solution`);
+
+            // Récupérer l'index de la dernière piste affichée (ou -1 si aucune)
+            let currentHintIndex = -1;
+            for (let i = 0; i < totalHints; i++) {
+                const hint = section.querySelector(`#${sectionName.toLowerCase()}-${index+1}-hint-${i}`);
+                if (hint && hint.style.display === 'block') {
+                    currentHintIndex = i;
                 }
             }
+            
+            const nextHintIndex = currentHintIndex + 1;
+            const nextHintId = `${sectionName.toLowerCase()}-${index+1}-hint-${nextHintIndex}`;
+            const nextHintElement = document.getElementById(nextHintId);
 
-            // Masquer le bouton si toutes les aides sont affichées
+            if (nextHintElement) {
+                nextHintElement.style.display = 'block';
+            }
+
+            // Cacher le bouton "Piste" si toutes les pistes sont affichées
             if (currentHintIndex + 1 >= totalHints) {
-                const button = document.querySelector(`#section-${sectionName} .hint-button`);
+                const button = section.querySelector(`#section-${sectionName} .action-buttons:nth-child(${index * 3 + 3}) .hint-button`);
                 if (button) {
                      button.style.display = 'none';
                 }
             }
+             
              // Relancer MathJax sur la section pour rendre les éventuelles formules LaTeX dans l'aide
-             if (typeof MathJax !== 'undefined') {
+             if (typeof MathJax !== 'undefined' && nextHintElement) {
                  // On ne demande le rendu que de l'élément d'aide qui vient d'apparaître pour optimiser
-                 MathJax.typesetPromise([document.getElementById(nextHintId)]); 
+                 MathJax.typesetPromise([nextHintElement]); 
              } 
         }
 
+        // Affiche/Masque la solution d'un exercice
+        function toggleSolution(solutionId) {
+            const sol = document.getElementById(solutionId);
+            const isHidden = sol.style.display === 'none' || sol.style.display === '';
+            sol.style.display = isHidden ? 'block' : 'none';
+            
+             // Si on vient d'afficher la solution, on demande à MathJax de la rendre
+             if (sol.style.display === 'block' && typeof MathJax !== 'undefined') {
+                 MathJax.typesetPromise([sol]); 
+             }
+        }
+        
         // Affiche/Masque toutes les solutions
         function toggleAllSolutions(button) {
-            const solutions = button.parentNode.querySelectorAll('.solution');
+            // Cacher les droits d'auteur si affichés
+            document.getElementById('copyright-content').style.display = 'none';
+            
+            const solutions = document.querySelectorAll('.exercice-section .solution');
+            const show = solutions[0] && (solutions[0].style.display === 'none' || solutions[0].style.display === '');
+            
             solutions.forEach(sol => {
-                const isHidden = sol.style.display === 'none' || sol.style.display === '';
-                sol.style.display = isHidden ? 'block' : 'none';
+                sol.style.display = show ? 'block' : 'none';
             });
+             
              // Si on vient d'afficher les solutions, on demande à MathJax de les rendre
-             if (solutions[0].style.display === 'block' && typeof MathJax !== 'undefined') {
+             if (show && typeof MathJax !== 'undefined') {
                  MathJax.typesetPromise(solutions); 
              }
         }
+        
+        // Fonction pour afficher/masquer le contenu des droits d'auteur
+        function toggleCopyright() {
+            const copyrightDiv = document.getElementById('copyright-content');
+            const isHidden = copyrightDiv.style.display === 'none' || copyrightDiv.style.display === '';
+            copyrightDiv.style.display = isHidden ? 'block' : 'none';
+            
+            // Masquer les exercices si les droits d'auteur sont affichés (optionnel, pour dégager la vue)
+            document.getElementById('exercices-container').style.display = isHidden ? 'none' : 'block';
+        }
+
+
+        // --- INITIALISATION ET ÉVÉNEMENTS ---
 
         // Générer le premier exercice au chargement initial de la page
         document.addEventListener('DOMContentLoaded', () => {
+            // Événement pour le bouton Droits d'Auteur
+            document.getElementById('copyright-btn').addEventListener('click', toggleCopyright);
+            
+            // S'assurer que le contenu des droits d'auteur est masqué au départ
+            document.getElementById('copyright-content').style.display = 'none';
+            
             generateExercises(); 
         });
     </script>
