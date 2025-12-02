@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercices sur les évolutions</title>
+    <script>
+        window.MathJax = {
+            loader: { load: ['input/tex', 'output/chtml'] },
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                processEscapes: true,
+                packages: {'[+]': ['ams']}
+            },
+            startup: {
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    MathJax.startup.promise.then(() => {
+                        console.log('MathJax chargé');
+                    });
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .exercice {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .boutons-exercice {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .reponse {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            display: none;
+        }
+        .correction {
+            margin-top: 10px;
+            padding: 15px;
+            background-color: #d4edda;
+            border-radius: 5px;
+            display: none;
+        }
+        .bouton-reponse {
+            background-color: #28a745;
+        }
+        .bouton-reponse:hover {
+            background-color: #218838;
+        }
+        .bouton-correction {
+            background-color: #dc3545;
+        }
+        .bouton-correction:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Exercices sur les évolutions</h1>
+        <button id="generer">Générer un nouvel exercice</button>
+        <div id="exercices"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('generer').addEventListener('click', genererExercice);
+            genererExercice();
+        });
+
+        function arrondir(valeur, decimales) {
+            return Number(Math.round(valeur + 'e' + decimales) + 'e-' + decimales);
+        }
+
+        function getRandomArbitrary(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        function genererExercice() {
+            const exercicesDiv = document.getElementById('exercices');
+            exercicesDiv.innerHTML = '';
+            
+            // Les 4 types d'exercices
+            const typesExercice = [
+                'valeurArrivee',
+                'valeurDepart',
+                'evolutionManquante',
+                'tauxMoyen'
+            ];
+            const type = typesExercice[Math.floor(Math.random() * typesExercice.length)];
+
+            let enonce, reponse, correction;
+
+            const valeurDepart = arrondir(getRandomArbitrary(100, 500), 0);
+            const nombreEvolutions = 3;
+            const evolutions = [];
+            for (let i = 0; i < nombreEvolutions; i++) {
+                evolutions.push(arrondir(getRandomArbitrary(-25, 50), 2));
+            }
+            const coeffMultiplicateurs = evolutions.map(e => 1 + e / 100);
+
+            switch (type) {
+                case 'valeurArrivee':
+                    {
+                        const coeffGlobal = coeffMultiplicateurs.reduce((acc, current) => acc * current, 1);
+                        const valeurArrivee = arrondir(valeurDepart * coeffGlobal, 2);
+
+                        enonce = `La valeur de départ est de \\( ${valeurDepart} \\). Elle subit des évolutions successives de ${evolutions.map(e => `\\( ${e}\\% \\)`).join(', ')}. Quelle est la valeur d'arrivée ?`;
+                        reponse = `La valeur d'arrivée est de \\( ${valeurArrivee} \\).`;
+                        correction = `
+                            <h4>Correction détaillée :</h4>
+                            <p>On utilise la formule des évolutions successives :</p>
+                            \\[
+                            \\text{Valeur d'arrivée} = \\text{Valeur de départ} \\times (1 + t_1) \\times (1 + t_2) \\times ...
+                            \\]
+                            <p>Les coefficients multiplicateurs sont :</p>
+                            ${evolutions.map(e => `\\( C_{${evolutions.indexOf(e)+1}} = 1 + \\frac{${e}}{100} = ${arrondir(1 + e/100, 4)} \\)`).join('<br>')}
+                            <p>Le coefficient multiplicateur global est :</p>
+                            \\[
+                            C_{global} = ${coeffMultiplicateurs.map(c => arrondir(c, 4)).join(' \\times ')} = ${arrondir(coeffGlobal, 4)}
+                            \\]
+                            <p>On calcule la valeur d'arrivée :</p>
+                            \\[
+                            \\text{Valeur d'arrivée} = ${valeurDepart} \\times ${arrondir(coeffGlobal, 4)} = ${valeurArrivee}
+                            \\]
+                        `;
+                    }
+                    break;
+                case 'valeurDepart':
+                    {
+                        const coeffGlobal = coeffMultiplicateurs.reduce((acc, current) => acc * current, 1);
+                        const valeurArrivee = arrondir(valeurDepart * coeffGlobal, 2);
+
+                        enonce = `Une valeur a subi des évolutions successives de ${evolutions.map(e => `\\( ${e}\\% \\)`).join(', ')}. La valeur finale est de \\( ${valeurArrivee} \\). Quelle était la valeur de départ ?`;
+                        reponse = `La valeur de départ était de \\( ${valeurDepart} \\).`;
+                        correction = `
+                            <h4>Correction détaillée :</h4>
+                            <p>On utilise la formule des évolutions successives en inversant le calcul :</p>
+                            \\[
+                            \\text{Valeur de départ} = \\frac{\\text{Valeur d'arrivée}}{C_{global}}
+                            \\]
+                            <p>Le coefficient multiplicateur global est :</p>
+                            \\[
+                            C_{global} = ${coeffMultiplicateurs.map(c => arrondir(c, 4)).join(' \\times ')} = ${arrondir(coeffGlobal, 4)}
+                            \\]
+                            <p>On calcule la valeur de départ :</p>
+                            \\[
+                            \\text{Valeur de départ} = \\frac{${valeurArrivee}}{${arrondir(coeffGlobal, 4)}} = ${valeurDepart}
+                            \\]
+                        `;
+                    }
+                    break;
+                case 'evolutionManquante':
+                    {
+                        const evolutionManquante = arrondir(getRandomArbitrary(-25, 50), 2);
+                        const toutesEvolutions = [...evolutions, evolutionManquante];
+                        toutesEvolutions.sort(() => Math.random() - 0.5);
+                        
+                        const evolutionsAffichees = toutesEvolutions.map(e => {
+                            if (e === evolutionManquante) return 'x';
+                            return arrondir(e, 2);
+                        });
+
+                        const coeffGlobal = toutesEvolutions.reduce((acc, current) => acc * (1 + current / 100), 1);
+                        const valeurArrivee = arrondir(valeurDepart * coeffGlobal, 2);
+
+                        enonce = `La valeur de départ est de \\( ${valeurDepart} \\) et la valeur d'arrivée est de \\( ${valeurArrivee} \\). Elle a subi des évolutions successives de ${evolutionsAffichees.map(e => `\\( ${e}\\% \\)`).join(', ')}. Quelle est l'évolution manquante \\( x \\) ?`;
+                        reponse = `L'évolution manquante est de \\( ${evolutionManquante}\\% \\).`;
+                        
+                        const coeffsConnus = evolutions.map(e => 1 + e/100);
+                        const coeffGlobalConnu = coeffsConnus.reduce((acc, current) => acc * current, 1);
+                        
+                        correction = `
+                            <h4>Correction détaillée :</h4>
+                            <p>Soit \\( C_x = 1 + \\frac{x}{100} \\) le coefficient multiplicateur de l'évolution manquante. On a :</p>
+                            \\[
+                            \\text{Valeur de départ} \\times C_{global} = \\text{Valeur d'arrivée}
+                            \\]
+                            \\[
+                            ${valeurDepart} \\times ${coeffsConnus.map(c => arrondir(c, 4)).join(' \\times ')} \\times C_x = ${valeurArrivee}
+                            \\]
+                            <p>On calcule le produit des coefficients connus :</p>
+                            \\[
+                            C_{connu} = ${coeffsConnus.map(c => arrondir(c, 4)).join(' \\times ')} = ${arrondir(coeffGlobalConnu, 4)}
+                            \\]
+                            <p>On isole \\( C_x \\) :</p>
+                            \\[
+                            C_x = \\frac{${valeurArrivee}}{${valeurDepart} \\times ${arrondir(coeffGlobalConnu, 4)}} = ${arrondir(coeffGlobal, 4)}
+                            \\]
+                            <p>On trouve \\( x \\) en utilisant la formule \\( x = 100 \\times (C_x - 1) \\) :</p>
+                            \\[
+                            x = 100 \\times (${arrondir(coeffGlobal, 4)} - 1) = ${evolutionManquante}\\%
+                            \\]
+                        `;
+                    }
+                    break;
+                case 'tauxMoyen':
+                    {
+                        const coeffGlobal = coeffMultiplicateurs.reduce((acc, current) => acc * current, 1);
+                        const tauxMoyen = arrondir( (Math.pow(coeffGlobal, 1/nombreEvolutions) - 1) * 100, 2);
+                        
+                        enonce = `Une valeur a subi ${nombreEvolutions} évolutions successives de ${evolutions.map(e => `\\( ${e}\\% \\)`).join(', ')}. Quel est le taux d'évolution annuel moyen ?`;
+                        reponse = `Le taux d'évolution annuel moyen est de \\( ${tauxMoyen}\\% \\).`;
+                        
+                        correction = `
+                            <h4>Correction détaillée :</h4>
+                            <p>Pour trouver le taux d'évolution moyen, on doit d'abord calculer le coefficient multiplicateur global.</p>
+                            \\[
+                            C_{global} = (1 + t_1) \\times (1 + t_2) \\times ...
+                            \\]
+                            \\[
+                            C_{global} = ${coeffMultiplicateurs.map(c => arrondir(c, 4)).join(' \\times ')} = ${arrondir(coeffGlobal, 4)}
+                            \\]
+                            <p>Ensuite, on utilise la formule du coefficient multiplicateur moyen \\( C_{moyen} \\) :</p>
+                            \\[
+                            C_{moyen} = (C_{global})^{\\frac{1}{n}} \\qquad (\\text{où } n = \\text{nombre d'évolutions})
+                            \\]
+                            \\[
+                            C_{moyen} = (${arrondir(coeffGlobal, 4)})^{\\frac{1}{${nombreEvolutions}}} = ${arrondir(Math.pow(coeffGlobal, 1/nombreEvolutions), 4)}
+                            \\]
+                            <p>Enfin, on trouve le taux d'évolution moyen \\( t_m \\) :</p>
+                            \\[
+                            t_m = (C_{moyen} - 1) \\times 100 = (${arrondir(Math.pow(coeffGlobal, 1/nombreEvolutions), 4)} - 1) \\times 100 = ${tauxMoyen}\\%
+                            \\]
+                        `;
+                    }
+                    break;
+            }
+
+            const exerciceDiv = document.createElement('div');
+            exerciceDiv.className = 'exercice';
+            exerciceDiv.innerHTML = `
+                <p>${enonce}</p>
+                <div class="boutons-exercice">
+                    <button class="bouton-reponse">Voir la réponse</button>
+                    <button class="bouton-correction">Voir la correction détaillée</button>
+                </div>
+                <div class="reponse">${reponse}</div>
+                <div class="correction">${correction}</div>
+            `;
+            exercicesDiv.appendChild(exerciceDiv);
+
+            const reponseBouton = exerciceDiv.querySelector('.bouton-reponse');
+            const correctionBouton = exerciceDiv.querySelector('.bouton-correction');
+
+            reponseBouton.addEventListener('click', function() {
+                const reponseDiv = this.parentNode.nextElementSibling;
+                reponseDiv.style.display = 'block';
+                MathJax.typesetPromise([reponseDiv]);
+            });
+
+            correctionBouton.addEventListener('click', function() {
+                const correctionDiv = this.parentNode.nextElementSibling.nextElementSibling;
+                correctionDiv.style.display = 'block';
+                MathJax.typesetPromise([correctionDiv]);
+            });
+
+            MathJax.typesetPromise([exerciceDiv]);
+        }
+    </script>
+</body>
+</html>
